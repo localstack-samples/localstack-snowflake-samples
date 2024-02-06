@@ -1,0 +1,57 @@
+CREDIT_REQUEST_ID,CREDIT_AMOUNT,CREDIT_DURATION,PURPOSE,INSTALLMENT_COMMITMENT,OTHER_PARTIES,CREDIT_STANDING,CREDIT_SCORE,CHECKING_BALANCE,SAVINGS_BALANCE,EXISTING_CREDITS,ASSETS,HOUSING,QUALIFICATION,JOB_HISTORY,AGE,SEX,MARITAL_STATUS,NUM_DEPENDENTS,RESIDENCE_SINCE,OTHER_PAYMENT_PLANS
+147,8600,6,Vehicle,1,None,good,466,-728.12,17.00,2,None,own,skilled,15,39,F,Married,1,4,none
+248,12040,6,Vehicle,4,None,good,202,0.00,2443.00,1,None,rent,skilled,1,35,M,Single,1,1,bank
+112,3920,15,Tuition,4,None,good,736,4696.00,143.00,1,Investments,rent,skilled,1,23,F,Married,1,4,none
+222,12000,12,Tuition,4,None,good,732,-25.35,0.00,1,Investments,rent,skilled,3,23,F,Married,1,4,bank
+162,10550,18,Vehicle,4,None,good,507,0.00,510.00,2,Investments,own,skilled,1,30,F,Married,1,1,none
+71,81330,36,Vehicle,1,None,good,670,0.00,268.00,1,Investments,own,skilled,2,30,F,Married,1,2,bank
+165,9090,36,Vehicle,4,None,good,704,0.00,9353.54,1,Investments,own,skilled,16,36,M,Single,1,4,none
+24,18040,12,Vehicle,3,None,good,352,242.00,1830.00,1,Investments,own,skilled,1,44,M,Single,1,4,none
+210,14130,12,Vehicle,3,None,good,739,0.00,14238.00,1,Investments,own,skilled,5,55,M,Single,1,2,none
+126,21210,12,Vehicle,4,None,good,417,-280.75,185.00,2,Investments,own,skilled,2,30,M,Single,1,2,none
+54,33780,18,Vehicle,2,None,good,693,0.00,0.00,1,Investments,own,skilled,1,31,M,Single,1,1,none
+217,31040,18,Business,3,None,good,200,-717.33,90.00,1,Investments,own,skilled,5,31,M,Single,1,1,bank
+105,24450,12,Vehicle,2,None,good,684,0.00,0.00,1,Vehicle,rent,skilled,1,26,M,Married,1,4,none
+44,61870,30,Vehicle,1,None,good,452,-484.50,1399.00,2,Vehicle,rent,skilled,4,24,M,Married,1,4,none
+111,14490,6,Business,1,None,good,627,64.00,2557.00,2,Vehicle,own,skilled,10,31,M,Divorced,2,2,bank
+97,20120,12,Tuition,4,None,good,517,0.00,0.00,1,Vehicle,own,skilled,5,61,F,Married,1,2,none
+148,6820,12,Vehicle,4,None,good,323,0.00,4030.00,2,Vehicle,own,skilled,5,51,F,Married,1,3,none
+131,84870,48,Vehicle,1,None,good,671,1396.00,0.00,1,Vehicle,own,skilled,4,24,F,Married,1,2,none
+15,14030,15,Vehicle,2,None,good,734,-634.97,124.00,1,Vehicle,rent,skilled,3,28,F,Married,1,4,none
+220,13640,10,Vehicle,2,None,good,685,0.00,436.00,1,Vehicle,own,skilled,1,64,F,Married,1,4,none
+201,9360,9,Tuition,4,None,good,410,0.00,6650.89,2,Vehicle,own,skilled,14,52,M,Single,1,2,none
+37,61100,48,Tuition,1,None,good,351,0.00,261.00,1,None,free,skilled,1,31,M,Single,1,3,bank
+124,7810,10,Vehicle,4,None,good,444,4198.00,793.00,2,None,free,skilled,10,63,M,Single,1,4,none
+199,27600,24,Vehicle,4,None,good,698,1661.00,0.00,1,None,free,skilled,14,36,M,Single,1,4,bank
+159,35120,24,Vehicle,2,None,good,692,1486.00,3652.00,2,Vehicle,own,skilled,4,38,M,Single,1,3,bank
+108,60780,12,Vehicle,2,None,good,677,1238.00,960.00,1,Vehicle,own,skilled,5,32,M,Single,1,2,none
+137,86130,27,Vehicle,2,None,good,587,0.00,13073.00,2,Vehicle,own,skilled,2,27,M,Single,1,2,none
+33,58660,18,Vehicle,2,None,good,674,1364.00,2089.00,2,Vehicle,own,skilled,2,30,M,Single,1,2,none
+21,21340,9,Vehicle,4,None,good,513,0.00,678.00,3,Vehicle,own,skilled,1,48,M,Single,1,4,none
+225,46570,15,Vehicle,3,None,good,733,0.00,242.00,1,Vehicle,own,skilled,2,30,M,Single,1,2,none
+18,80720,30,Business,2,None,good,204,-97.60,0.00,3,Vehicle,own,skilled,1,25,M,Single,1,3,bank
+146,35660,48,Business,4,None,good,785,1108.00,4963.00,1,Vehicle,own,skilled,5,30,M,Single,1,2,none
+203,51170,27,Business,3,None,good,653,0.00,338.00,2,Vehicle,own,skilled,6,26,M,Single,1,4,none
+98,26220,18,Business,4,None,good,694,673.00,2733.00,1,Vehicle,own,skilled,3,34,M,Single,1,4,none
+48,13520,6,Vehicle,1,None,good,700,-600.79,6800.96,1,Investments,rent,unemployed,0,23,F,Married,1,2,none
+141,7090,6,Vehicle,2,None,good,708,3938.00,10801.00,1,Home,own,unemployed,1,27,M,Married,1,2,none
+68,10070,12,Vehicle,4,None,good,686,990.00,12944.00,1,Home,own,skilled,1,22,M,Married,1,1,none
+31,19130,18,Business,3,None,good,701,1266.00,16623.00,1,Home,own,skilled,1,36,M,Married,1,3,bank
+61,13910,9,Business,2,None,good,708,363.00,110.00,1,Home,own,skilled,3,27,M,Married,1,1,bank
+244,11850,12,Business,3,None,good,303,0.00,756.00,2,Home,own,skilled,3,27,F,Married,1,2,none
+95,13180,12,Vehicle,4,None,good,724,394.00,14972.00,1,Home,own,skilled,11,54,M,Single,1,4,none
+92,14090,12,Vehicle,4,None,good,319,-351.50,352.00,1,Home,own,skilled,23,54,M,Single,1,3,none
+180,5710,21,Vehicle,4,None,good,432,-911.02,979.00,2,Home,own,skilled,9,65,M,Single,1,4,none
+86,14120,12,Business,4,Guarantor,good,475,0.00,480.00,2,Home,own,highly skilled,1,29,F,Married,1,2,none
+100,70570,20,Vehicle,3,None,good,593,1599.00,0.00,2,Investments,rent,highly skilled,5,36,M,Single,2,4,bank
+120,23660,12,Vehicle,3,None,good,337,1969.00,7333.41,1,Vehicle,own,highly skilled,5,36,M,Divorced,1,3,none
+46,13930,11,Vehicle,4,None,good,322,0.00,628.00,2,Vehicle,own,highly skilled,1,35,F,Married,1,4,none
+129,18600,12,Vehicle,4,None,good,525,737.00,761.00,2,Vehicle,own,highly skilled,0,34,M,Single,1,2,none
+73,11640,8,Other,3,None,good,462,-770.18,832.00,2,None,free,highly skilled,22,51,M,Single,2,4,bank
+76,15260,12,Vehicle,4,None,good,484,-448.90,885.00,2,None,free,highly skilled,9,66,M,Single,1,4,none
+164,73080,10,Vehicle,2,None,good,719,1633.00,156.00,1,None,free,highly skilled,0,70,M,Single,1,4,bank
+89,22490,18,Vehicle,4,None,good,725,-946.70,4515.00,1,Vehicle,own,highly skilled,4,30,M,Single,2,3,none
+8,69480,36,Vehicle,2,None,good,677,696.00,665.00,1,Vehicle,rent,highly skilled,1,35,M,Single,1,2,none
+155,69670,24,Business,4,None,good,662,696.00,3213.00,1,Vehicle,rent,highly skilled,4,36,M,Single,1,4,none
+246,12580,24,Business,4,None,good,689,0.00,113.00,1,Home,own,skilled,6,25,M,Single,1,1,none
+224,29780,24,Business,4,None,good,658,0.00,0.00,2,Home,own,skilled,2,32,M,Single,2,4,none
