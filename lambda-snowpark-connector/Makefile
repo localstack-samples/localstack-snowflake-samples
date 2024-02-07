@@ -1,5 +1,5 @@
 install:
-	pip3 uninstall \
+	pip3 install \
 		--platform manylinux2010_x86_64 \
 		--implementation cp \
 		--only-binary=:all: --upgrade \
@@ -22,3 +22,12 @@ local-invoke:
 	awslocal lambda invoke --function-name localstack-snowflake-lambda-example \
 	--cli-binary-format raw-in-base64-out \
 	--payload '{"body": "test" }' output.txt
+
+start-localstack:
+	DOCKER_FLAGS="-e DEBUG=1 -e SF_LOG=trace" LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=180 localstack start -d
+
+ready:         ## Check if the LocalStack container is up and running.
+	localstack wait -t 20 && echo "LocalStack is ready to use!"
+
+stop:          ## Stop LocalStack infrastructure
+	localstack stop
