@@ -9,6 +9,7 @@ This example demonstrates how to connect Snowpark to AWS Lambda locally using Lo
 
 ## Prerequisites
 
+- Python 3.10 installed locally
 - [LocalStack](https://localstack.cloud/) with `LOCALSTACK_AUTH_TOKEN` environment variable set
 - [LocalStack Snowflake extension](https://discuss.localstack.cloud/t/introducing-the-localstack-snowflake-extension-experimental/665)
 
