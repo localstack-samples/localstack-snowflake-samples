@@ -4,7 +4,7 @@ This example demonstrates how to connect Snowpark to AWS Lambda locally using Lo
 
 - Establish a connection to a local Snowflake database provided by LocalStack.
 - Create a cursor object and execute a simple query to create a table.
-- Insert rows and execute an insert query with executemany and a query to select data from the table.
+- Insert rows and execute an insert query with `executemany` and a query to select data from the table.
 - Fetch the results and execute a query to get the current timestamp.
 
 ## Prerequisites
