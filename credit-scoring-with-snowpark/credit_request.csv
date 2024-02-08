@@ -1,0 +1,57 @@
+CREDIT_REQUEST_ID,CREDIT_AMOUNT,CREDIT_DURATION,PURPOSE,INSTALLMENT_COMMITMENT,OTHER_PARTIES,CREDIT_SCORE,CHECKING_BALANCE,SAVINGS_BALANCE,EXISTING_CREDITS,ASSETS,HOUSING,QUALIFICATION,JOB_HISTORY,AGE,SEX,MARITAL_STATUS,NUM_DEPENDENTS,RESIDENCE_SINCE,OTHER_PAYMENT_PLANS
+182,44550,36,Business,2,None,656,259.00,628.00,2,Home,own,highly skilled,1,30,M,Divorced,1,2,stores
+188,11750,16,Vehicle,2,None,549,1892.00,723.00,3,Vehicle,free,unemployed,0,68,M,Single,1,3,none
+122,38680,24,Vehicle,4,None,356,0.00,586.00,2,Vehicle,rent,highly skilled,7,41,F,Married,1,2,none
+245,34470,12,Tuition,4,None,749,0.00,8102.00,1,Home,own,unskilled,1,35,F,Married,2,3,none
+447,18420,36,Vehicle,4,None,672,-463.77,428.00,1,Vehicle,own,skilled,1,34,F,Married,1,4,none
+581,10560,18,Vehicle,3,Guarantor,479,1676.00,365.00,2,Home,own,skilled,18,36,M,Single,1,3,bank
+716,75960,30,Vehicle,1,None,327,0.00,0.00,2,Vehicle,own,skilled,10,63,M,Single,1,4,none
+285,38780,24,Vehicle,4,None,543,1555.00,1885.00,1,Vehicle,own,skilled,1,37,M,Divorced,1,2,none
+328,15250,24,Vehicle,4,None,676,0.00,11818.00,1,Vehicle,own,skilled,5,34,F,Married,2,3,none
+488,37570,24,Vehicle,4,Co-Applicant,716,0.00,493.00,1,None,free,skilled,12,62,F,Married,1,4,none
+474,12380,6,Tuition,4,None,686,0.00,0.00,1,Investments,own,highly skilled,0,36,M,Single,2,4,none
+264,27480,12,Tuition,2,None,496,0.00,460.00,3,None,free,unskilled,21,57,F,Married,1,4,bank
+1748,12740,12,Vehicle,3,None,715,-441.52,757.00,1,Home,own,unskilled,1,37,F,Married,1,1,none
+916,184240,48,Other,1,None,278,1155.00,871.00,1,Investments,own,highly skilled,3,32,F,Married,1,2,bank
+933,12240,9,Vehicle,3,None,409,0.00,577.00,2,Home,own,skilled,1,30,M,Single,1,1,none
+1285,38780,24,Vehicle,4,None,384,1675.00,1318.00,1,Vehicle,own,skilled,1,37,M,Divorced,1,2,none
+1000,45760,45,Vehicle,3,None,522,1492.00,4658.00,1,Vehicle,own,skilled,0,27,M,Single,1,4,none
+1741,23250,24,Vehicle,2,None,744,-359.09,3528.00,1,Vehicle,own,skilled,4,32,M,Single,1,3,bank
+1216,9320,6,Tuition,1,None,457,1056.00,0.00,2,Investments,own,unskilled,4,39,F,Married,1,3,none
+910,31950,9,Vehicle,1,None,691,518.00,0.00,1,Home,own,unskilled,1,33,F,Married,1,2,none
+1517,13610,6,Vehicle,2,None,431,-329.57,983.00,1,Home,own,unskilled,1,40,M,Single,2,4,none
+1073,11640,8,Other,3,None,335,-780.79,211.00,2,None,free,highly skilled,11,51,M,Single,2,4,bank
+809,92830,42,Vehicle,1,None,768,1646.00,904.00,1,None,free,highly skilled,0,55,M,Single,1,2,bank
+779,57110,36,Vehicle,4,None,498,0.00,17356.00,2,Vehicle,own,highly skilled,11,38,M,Single,1,2,none
+2648,13860,12,Vehicle,2,None,695,0.00,9868.56,1,Investments,own,skilled,2,26,F,Married,1,2,none
+2501,31230,24,Vehicle,4,None,721,-874.82,315.00,1,Investments,own,skilled,1,27,F,Married,1,1,none
+2564,123890,36,Vehicle,1,None,684,1253.00,0.00,1,None,free,skilled,1,37,M,Single,1,4,none
+2598,42410,24,Business,1,None,227,1429.00,889.00,3,Home,own,unskilled,3,36,M,Single,1,4,none
+2440,6090,12,Business,4,None,774,3921.00,492.00,1,Home,own,unemployed,1,26,F,Married,1,1,none
+2275,119980,30,Repairs,1,None,688,-447.86,132.00,1,None,own,unskilled,1,34,M,Divorced,1,1,none
+2068,10070,12,Vehicle,4,None,727,1165.00,13522.00,1,Home,own,skilled,3,22,M,Married,1,1,none
+2856,14740,24,Vehicle,4,None,714,0.00,1799.00,1,Home,own,skilled,1,33,M,Married,1,3,none
+2465,19500,18,Business,4,None,682,0.00,830.00,2,Vehicle,own,skilled,6,34,M,Single,1,1,stores
+2686,65270,60,Vehicle,4,None,731,0.00,0.00,1,None,free,skilled,3,34,M,Single,2,4,none
+2113,62600,18,Vehicle,3,None,707,130.00,868.00,1,Home,rent,unskilled,4,28,M,Single,1,3,none
+2158,3390,12,Tuition,4,None,766,-310.00,356.00,1,Vehicle,own,unskilled,22,45,M,Married,1,1,bank
+1819,158570,36,Other,2,Co-Applicant,714,-843.10,965.00,1,Vehicle,own,highly skilled,0,43,M,Divorced,1,3,none
+2111,14490,6,Business,1,None,631,214.00,2935.00,2,Vehicle,own,skilled,15,33,M,Divorced,2,2,bank
+1809,92830,42,Vehicle,1,None,774,388.00,251.00,1,None,free,highly skilled,0,55,M,Single,1,2,bank
+29,24150,7,Consumer Goods,3,Guarantor,722,1709.00,811.00,1,Home,own,skilled,3,34,M,Single,1,2,none
+94,36170,24,Consumer Goods,4,Co-Applicant,364,3257.00,0.00,2,None,rent,skilled,16,34,M,Single,1,4,none
+518,71270,36,Consumer Goods,2,None,492,0.00,541.00,2,Investments,rent,skilled,1,23,F,Married,1,4,none
+633,14440,15,Consumer Goods,4,None,697,115.00,0.00,1,Investments,own,skilled,1,23,M,Single,1,1,none
+509,14130,24,Consumer Goods,4,None,700,0.00,173.00,1,Investments,own,skilled,2,28,M,Married,1,2,none
+373,21460,10,Consumer Goods,1,None,334,0.00,292.00,2,Home,rent,skilled,1,23,F,Married,1,3,none
+1296,99600,48,Consumer Goods,1,None,682,1508.00,326.00,1,Vehicle,own,skilled,1,26,F,Married,1,2,none
+1743,31600,21,Consumer Goods,4,None,739,0.00,0.00,1,Investments,own,skilled,14,41,M,Single,1,3,none
+849,13640,9,Consumer Goods,3,None,701,-795.48,424.00,1,Home,own,skilled,5,59,M,Single,1,4,none
+1606,28280,24,Consumer Goods,4,None,760,-972.78,5185.42,1,Home,own,skilled,1,22,M,Single,1,4,stores
+808,9300,12,Consumer Goods,4,None,321,0.00,0.00,4,Home,own,skilled,21,65,M,Single,1,4,none
+1257,26840,24,Consumer Goods,4,None,571,0.00,417.00,2,Home,own,unskilled,3,35,M,Single,1,2,none
+1397,25780,12,Consumer Goods,3,None,709,-576.58,251.00,1,None,free,highly skilled,0,55,F,Married,1,4,none
+2900,41530,18,Consumer Goods,2,Co-Applicant,725,-467.22,387.00,1,Vehicle,own,skilled,2,42,M,Single,1,3,none
+2475,12450,18,Consumer Goods,4,None,421,586.00,941.00,1,Vehicle,own,skilled,1,33,M,Married,1,2,none
+2093,7970,12,Consumer Goods,4,None,422,0.00,0.00,1,Investments,own,unskilled,11,33,F,Married,2,3,bank
+2572,59540,30,Consumer Goods,3,Co-Applicant,310,0.00,143.00,1,Vehicle,own,skilled,4,38,M,Single,1,2,none
