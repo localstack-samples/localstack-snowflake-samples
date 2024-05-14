@@ -1,0 +1,15 @@
+---------DATAFRAME EXECUTION PLAN----------
+Query List:
+1.
+SELECT "ID", to_date(dateadd('DAY', seq4(0), '2019-04-01')) AS "TX_DATE" FROM ( SELECT ( ROW_NUMBER()  OVER ( ORDER BY  SEQ8() ) -  1 ) * (1) + (0) AS id FROM ( TABLE (GENERATOR(ROWCOUNT => 152))))
+Logical Execution Plan:
+GlobalStats:
+    partitionsTotal=0
+    partitionsAssigned=0
+    bytesAssigned=0
+Operations:
+1:0     ->Result  ((ROW_NUMBER() OVER (ORDER BY SEQ8() ASC NULLS LAST)) - 1) + 0, TO_DATE(DATE_ADDDAYSTOTIMESTAMP(SEQ4(0), '2019-04-01 00:00:00.000000000Z'))  
+1:1          ->WindowFunction  ROW_NUMBER() OVER (ORDER BY SEQ8() ASC NULLS LAST)  
+1:2               ->Generator  152  
+
+--------------------------------------------

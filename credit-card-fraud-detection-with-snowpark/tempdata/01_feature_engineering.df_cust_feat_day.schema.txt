@@ -1,0 +1,14 @@
+StructType([StructField('TX_DATE', DateType(), nullable=False), StructField('CUSTOMER_ID', LongType(), nullable=True), StructField('NO_TRX', LongType(), nullable=True), StructField('TOT_AMOUNT', DoubleType(), nullable=True), StructField('CUST_TX_PREV_1', LongType(), nullable=True), StructField('CUST_TX_PREV_7', LongType(), nullable=True), StructField('CUST_TX_PREV_30', LongType(), nullable=True), StructField('CUST_TOT_AMT_PREV_1', DoubleType(), nullable=True), StructField('CUST_TOT_AMT_PREV_7', DoubleType(), nullable=True), StructField('CUST_TOT_AMT_PREV_30', DoubleType(), nullable=True)])
+
+
+
+[StructField('TX_DATE', DateType(), nullable=False),
+ StructField('CUSTOMER_ID', LongType(), nullable=True),
+ StructField('NO_TRX', LongType(), nullable=True),
+ StructField('TOT_AMOUNT', DoubleType(), nullable=True),
+ StructField('CUST_TX_PREV_1', LongType(), nullable=True),
+ StructField('CUST_TX_PREV_7', LongType(), nullable=True),
+ StructField('CUST_TX_PREV_30', LongType(), nullable=True),
+ StructField('CUST_TOT_AMT_PREV_1', DoubleType(), nullable=True),
+ StructField('CUST_TOT_AMT_PREV_7', DoubleType(), nullable=True),
+ StructField('CUST_TOT_AMT_PREV_30', DoubleType(), nullable=True)]

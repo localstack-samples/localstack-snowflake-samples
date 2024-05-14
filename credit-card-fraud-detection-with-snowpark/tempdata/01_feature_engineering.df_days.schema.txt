@@ -1,0 +1,6 @@
+StructType([StructField('ID', LongType(), nullable=False), StructField('TX_DATE', DateType(), nullable=False)])
+
+
+
+[StructField('ID', LongType(), nullable=False),
+ StructField('TX_DATE', DateType(), nullable=False)]

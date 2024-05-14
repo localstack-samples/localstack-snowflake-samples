@@ -1,0 +1,14 @@
+---------DATAFRAME EXECUTION PLAN----------
+Query List:
+1.
+SELECT min("TX_DATETIME") AS "END_DATE", datediff('DAY', "END_DATE", max("TX_DATETIME")) AS "NO_DAYS" FROM CUSTOMER_TRANSACTIONS_FRAUD
+Logical Execution Plan:
+GlobalStats:
+    partitionsTotal=0
+    partitionsAssigned=0
+    bytesAssigned=0
+Operations:
+1:0     ->Result  '2019-04-01 00:00:31.000000000Z', DATE_DIFFTIMESTAMPINDAYS('2019-04-01 00:00:31.000000000Z', '2019-08-31 23:59:07.000000000Z')  
+1:1          ->ValuesClause  ()  
+
+--------------------------------------------

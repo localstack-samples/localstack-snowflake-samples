@@ -1,0 +1,6 @@
+StructType([StructField('END_DATE', TimestampType(tz=ntz), nullable=True), StructField('NO_DAYS', LongType(), nullable=True)])
+
+
+
+[StructField('END_DATE', TimestampType(tz=ntz), nullable=True),
+ StructField('NO_DAYS', LongType(), nullable=True)]
