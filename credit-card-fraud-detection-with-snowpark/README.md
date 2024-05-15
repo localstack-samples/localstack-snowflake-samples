@@ -1,4 +1,4 @@
-# `credit-card-fraud-detection`
+# Credit Card Fraud detection with Snowflake & LocalStack 
 
 ## Overview
 
