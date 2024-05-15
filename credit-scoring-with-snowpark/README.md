@@ -1,6 +1,6 @@
 # Credit Scoring with Snowpark & LocalStack
 
-This notebook demonstrates how to use Snowpark for Python to perform exploratory data analysis (EDA) on a credit scoring dataset. This notebook uses LocalStack's Snowflake to run Snowflake data pipelines locally.
+This notebook demonstrates how to use Snowpark for Python to perform exploratory data analysis (EDA) on a credit scoring dataset. This notebook uses LocalStack's Snowflake emulator to run Snowflake data pipelines locally.
 
 ## Prerequisites
 
