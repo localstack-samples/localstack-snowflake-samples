@@ -2,9 +2,7 @@
 
 ## Overview
 
-Version of [the credit card fraud detection Snowpark Python
-demo](https://github.com/Snowflake-Labs/snowpark-python-demos/tree/main/Credit%20Card%20Fraud%20Detection)
-that is compatible with the LocalStack Snowflake emulator.
+This example is based on the Machine Learning for Credit Card Fraud detection and has been forked from a [public Snowflake sample](https://github.com/Snowflake-Labs/snowpark-python-demos/tree/main/Credit%20Card%20Fraud%20Detection). This sample shows how to use LocalStack's Snowflake emulator to perform feature engineering with Snowpark, preparing data for training a Machine Learning model and finally how to deploy and use a trained model in Snowflake using Python UDF — all on your local machine!
 
 ## Getting Started
 
