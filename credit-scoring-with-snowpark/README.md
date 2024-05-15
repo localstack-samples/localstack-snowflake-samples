@@ -1,23 +1,23 @@
 # Credit Scoring with Snowpark & LocalStack
 
-This notebook demonstrates how to use Snowpark for Python to perform exploratory data analysis (EDA) on a credit scoring dataset. This notebook uses LocalStack's Snowflake extension to emulate Snowflake APIs locally.
+This notebook demonstrates how to use Snowpark for Python to perform exploratory data analysis (EDA) on a credit scoring dataset. This notebook uses LocalStack's Snowflake to run Snowflake data pipelines locally.
 
 ## Prerequisites
 
-- [LocalStack](https://localstack.cloud/) with `LOCALSTACK_AUTH_TOKEN` environment variable set
-- [LocalStack Snowflake extension](https://discuss.localstack.cloud/t/introducing-the-localstack-snowflake-extension-experimental/665)
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 - [Jupyter Notebook](https://jupyter.org/)
 
 ## Running the notebook
 
-Start the LocalStack container using your preferred method. Ensure that you have access to LocalStack's Snowflake extension. Start a Jupyter Notebook server and open the notebook in your browser.
+Start the LocalStack container using your preferred method. Ensure that you have access to LocalStack's Snowflake emulator. Start a Jupyter Notebook server and open the notebook in your browser.
 
 ```bash
 jupyter notebook
 ```
 
-Open the `credit-scoring-eda.ipynb` notebook and run the cells to see the results. Follow the instructions in the notebook to install the required packages and set up the Snowflake extension.
+Open the `credit-scoring-eda.ipynb` notebook and run the cells to see the results. Follow the instructions in the notebook to install the required packages and set up the Snowflake emulator.
 
 ## License
 
