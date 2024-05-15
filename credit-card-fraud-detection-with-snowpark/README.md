@@ -8,7 +8,7 @@ that is compatible with the LocalStack Snowflake emulator.
 
 ## Getting Started
 
-This guide assumes you have already downloaded the GitHub repository, and have a
+This guide assumes you have already cloned the GitHub repository, and have a
 terminal context within this directory.
 
 This guide assumes you have a version of [Docker](https://www.docker.com/)
