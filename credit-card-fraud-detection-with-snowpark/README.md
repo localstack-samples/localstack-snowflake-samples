@@ -9,9 +9,10 @@ This example is based on the Machine Learning for Credit Card Fraud detection an
 This guide assumes you have already cloned the GitHub repository, and have a
 terminal context within this directory.
 
-This guide assumes you have a version of [Docker](https://www.docker.com/)
-installed, with the ability to fetch [the Python Docker
-image](https://hub.docker.com/_/python/) and associated dependencies.
+-   Docker
+-   Python 3.8 installed locally
+-   [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/) with `LOCALSTACK_AUTH_TOKEN` environment variable set
+-   [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
 1.  Check that dependencies exist:
 
