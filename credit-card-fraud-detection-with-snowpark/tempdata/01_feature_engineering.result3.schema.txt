@@ -1,8 +1,0 @@
-StructType([StructField('TX_DURING_WEEKEND', LongType(), nullable=False), StructField('TX_DURING_NIGHT', LongType(), nullable=False), StructField('TX_FRAUD', LongType(), nullable=True), StructField('PERCENTAGE', DecimalType(38, 6), nullable=True)])
-
-
-
-[StructField('TX_DURING_WEEKEND', LongType(), nullable=False),
- StructField('TX_DURING_NIGHT', LongType(), nullable=False),
- StructField('TX_FRAUD', LongType(), nullable=True),
- StructField('PERCENTAGE', DecimalType(38, 6), nullable=True)]

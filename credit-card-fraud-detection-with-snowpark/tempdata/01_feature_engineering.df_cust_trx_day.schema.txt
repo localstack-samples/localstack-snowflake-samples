@@ -1,8 +1,0 @@
-StructType([StructField('CUSTOMER_ID', LongType(), nullable=True), StructField('TX_DATE', DateType(), nullable=False), StructField('TOT_AMOUNT', DoubleType(), nullable=True), StructField('NO_TRX', LongType(), nullable=True)])
-
-
-
-[StructField('CUSTOMER_ID', LongType(), nullable=True),
- StructField('TX_DATE', DateType(), nullable=False),
- StructField('TOT_AMOUNT', DoubleType(), nullable=True),
- StructField('NO_TRX', LongType(), nullable=True)]

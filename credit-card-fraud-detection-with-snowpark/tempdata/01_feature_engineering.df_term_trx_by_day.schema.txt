@@ -1,8 +1,0 @@
-StructType([StructField('TERMINAL_ID', LongType(), nullable=True), StructField('TX_DATE', DateType(), nullable=False), StructField('NB_FRAUD', LongType(), nullable=True), StructField('NO_TRX', LongType(), nullable=True)])
-
-
-
-[StructField('TERMINAL_ID', LongType(), nullable=True),
- StructField('TX_DATE', DateType(), nullable=False),
- StructField('NB_FRAUD', LongType(), nullable=True),
- StructField('NO_TRX', LongType(), nullable=True)]

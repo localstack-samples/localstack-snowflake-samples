@@ -1,7 +1,0 @@
-StructType([StructField('TX_FRAUD', LongType(), nullable=True), StructField('NB_TX_DAY', LongType(), nullable=False), StructField('PERCENTAGE', DecimalType(38, 6), nullable=True)])
-
-
-
-[StructField('TX_FRAUD', LongType(), nullable=True),
- StructField('NB_TX_DAY', LongType(), nullable=False),
- StructField('PERCENTAGE', DecimalType(38, 6), nullable=True)]

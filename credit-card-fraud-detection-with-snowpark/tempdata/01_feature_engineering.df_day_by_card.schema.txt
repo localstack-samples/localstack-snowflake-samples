@@ -1,7 +1,0 @@
-StructType([StructField('"TO_DATE(TX_DATETIME)"', DateType(), nullable=True), StructField('NBR_FRAUD_TRX', LongType(), nullable=True), StructField('NBR_FRAUD_CARD', LongType(), nullable=False)])
-
-
-
-[StructField('"TO_DATE(TX_DATETIME)"', DateType(), nullable=True),
- StructField('NBR_FRAUD_TRX', LongType(), nullable=True),
- StructField('NBR_FRAUD_CARD', LongType(), nullable=False)]
