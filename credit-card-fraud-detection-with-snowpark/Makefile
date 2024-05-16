@@ -33,32 +33,53 @@ ifeq (run,$(firstword $(MAKECMDGOALS)))
 endif
 
 # Lifts command into `docker run` context.
-run: build
+#
+# NOTE: Make sure you have a `.env.localstack` environment file copied from
+# `.env.sample` into the same directory, and the LocalStack for Snowflake Docker
+# container running and accessible:
+# https://snowflake.localstack.cloud/getting-started/installation/
+localstack-run: build
 	docker run \
 		--rm \
 		-it \
 		-v ./:/app \
+		--env-file=.env.localstack \
+		--net=host \
+		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
+		bash -c "$(RUN_ARGS)"
+
+# Lifts command into `docker run` context.
+#
+# NOTE: Make sure you have a `.env.snowflake` environment file copied from
+# `.env.sample` into the same directory, and Snowflake Cloud with the session
+# credentials container active and accessible.
+localstack-run: build
+	docker run \
+		--rm \
+		-it \
+		-v ./:/app \
+		--env-file=.env.snowflake \
 		--net=host \
 		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
 		bash -c "$(RUN_ARGS)"
 
 update-deps:
-	$(MAKE) run 'pip-compile --generate-hashes --allow-unsafe --output-file=requirements.txt requirements.in'
+	$(MAKE) localstack-run 'pip-compile --generate-hashes --allow-unsafe --output-file=requirements.txt requirements.in'
 
 autoformat:
-	$(MAKE) run 'black .'
+	$(MAKE) localstack-run 'black .'
 
 load-tables:
-	$(MAKE) run 'python 00_load_tables.py'
+	$(MAKE) localstack-run 'python 00_load_tables.py'
 
 feature-engineering:
-	$(MAKE) run 'python 01_feature_engineering.py'
+	$(MAKE) localstack-run 'python 01_feature_engineering.py'
 
 train-model:
-	$(MAKE) run 'python 02_train_model.py'
+	$(MAKE) localstack-run 'python 02_train_model.py'
 
 sf-feature-engineering:
-	$(MAKE) run 'python 01_feature_engineering.snowflake.py'
+	$(MAKE) snowflake-run 'python 01_feature_engineering.snowflake.py'
 
 sf-train-model:
-	$(MAKE) run 'python 02_train_model.snowflake.py'
+	$(MAKE) snowflake-run 'python 02_train_model.snowflake.py'
