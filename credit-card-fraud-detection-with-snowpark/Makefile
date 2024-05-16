@@ -25,7 +25,16 @@ build:
 
 # From: https://stackoverflow.com/a/14061796
 # If the first argument is "docker-run"...
-ifeq (run,$(firstword $(MAKECMDGOALS)))
+ifeq (localstack-run,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments for "docker-run"
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(RUN_ARGS):;@:)
+endif
+
+# From: https://stackoverflow.com/a/14061796
+# If the first argument is "docker-run"...
+ifeq (snowflake-run,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "docker-run"
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
@@ -53,7 +62,7 @@ localstack-run: build
 # NOTE: Make sure you have a `.env.snowflake` environment file copied from
 # `.env.sample` into the same directory, and Snowflake Cloud with the session
 # credentials container active and accessible.
-localstack-run: build
+snowflake-run: build
 	docker run \
 		--rm \
 		-it \

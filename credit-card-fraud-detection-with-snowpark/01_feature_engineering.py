@@ -82,9 +82,6 @@ logging.info(df_cust_trx_fraud.show())
 # We can use the **describe** function on our **numeric** columns to get some
 # basic statistics. The only column in our current dataset would be TX_AMOUNT.
 
-import ipdb
-ipdb.set_trace()
-
 logging.info(df_cust_trx_fraud.describe().show())
 
 # We can see that we have about 6 months  of transactions and around 9k

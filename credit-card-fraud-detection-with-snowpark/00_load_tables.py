@@ -91,9 +91,6 @@ dfCustTrxFraudSchema = types.StructType(
 # Create a reader
 dfReader = session.read.schema(dfCustTrxFraudSchema)
 
-import ipdb
-ipdb.set_trace()
-
 # Get the data into the data frame
 dfCustTrxFraudRd = dfReader.csv(f"@{stage_name}/{FRAUD_TRANSACTIONS_CSV_GZ}")
 
