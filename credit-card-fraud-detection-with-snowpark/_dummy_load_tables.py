@@ -2,9 +2,8 @@
 # This script only loads enough information to run subsequent sections of the
 # demo.
 #
-# This is important in order to run `01_feature_engineering.py` after
-# restarting `localstack-ext`, since the database is not persisted between
-# runs.
+# This is important in order to run `01_feature_engineering.py` after restarting
+# `localstack/localstack-pro`, since the database is not persisted between runs.
 #
 # Using a separate Python script in order to avoid overwriting the workarounds
 # and TODO statements added in-line for the actual Python demo.
