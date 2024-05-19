@@ -1,0 +1,21 @@
+config:
+  target: 'http://localhost:3000'
+  ensure:
+    p95: 5000
+    maxErrorRate: 0
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 50
+      name: "Warm up"
+    - duration: 60
+      arrivalRate: 50
+      name: "Sustained load"
+scenarios:
+  - flow:
+    - get:
+        url: "/trips/monthly"
+    - get:
+        url: "/trips/day_of_week"
+    - get:
+        url: "/trips/temperature"
