@@ -27,7 +27,6 @@ To run the app, following steps are required:
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
-- [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 - [Streamlit CLI](https://github.com/streamlit/streamlit)
 
 Note: Snowpark requires python 3.8.*, please ensure that you have that version available in your environment.
