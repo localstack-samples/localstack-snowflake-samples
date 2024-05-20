@@ -1,0 +1,14 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 1
+      rampTo: 25
+      name: "Warm up"
+    - duration: 60
+      arrivalRate: 25
+      name: "Sustained max load"
+scenarios:
+  - flow:
+    - get:
+        url: "/trips/monthly?random=true"

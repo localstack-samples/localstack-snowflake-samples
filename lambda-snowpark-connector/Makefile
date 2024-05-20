@@ -28,7 +28,7 @@ local-invoke:   ## Invoke the Lambda locally
 	--payload '{"body": "test" }' output.txt
 
 start-localstack:
-	DOCKER_FLAGS="-e DEBUG=1 -e SF_LOG=trace" LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=180 localstack start -d
+	DOCKER_FLAGS="-e DEBUG=1 -e SF_LOG=trace" LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=180 IMAGE_NAME=localstack/snowflake:latest localstack start -d
 
 ready:         ## Check if the LocalStack container is up and running.
 	localstack wait -t 20 && echo "LocalStack is ready to use!"
