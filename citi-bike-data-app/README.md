@@ -15,6 +15,17 @@ The demo features a single-page web application (powered by Node.js) displaying 
 
 ## Instructions
 
+The sample application provides Makefile targets to simplify the setup process. You can run the following commands to start the LocalStack Snowflake emulator, seed the Citibike data, and start the web server:
+
+```bash
+make start
+make install
+make seed # Requires a local Snowflake CLI profile named 'local' (see below for instructions)
+make web-start
+```
+
+You can follow the instructions below to run the application manually.
+
 ### Start LocalStack
 
 Start the LocalStack Snowflake emulator using the following command:
@@ -76,6 +87,8 @@ npm start
 ```
 
 You can now access the web application at http://localhost:3000.
+
+![](images/citibike_trips_app.png)
 
 ## Troubleshooting
 
