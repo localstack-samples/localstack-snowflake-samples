@@ -130,7 +130,7 @@ dfCustTrxFraudRd = dfReader.csv(f"@{stage_name}/{FRAUD_TRANSACTIONS_CSV_GZ}")
 #       CAST("_COL9" AS INT) AS "TX_FRAUD_SCENARIO"
 #     FROM
 #       "LOAD_DATA"(
-#         '@FRAUD_DATA/fraud_transactions.csv.gz',
+#         '@FRAUD_DATA/fraud_transactions.min.csv.gz',
 #         'KCAoRklMRV9GT1JNQVQgPT4gJyJ0ZXN0Ii4iUFVCTElDIi5TTk9XUEFSS19URU1QX0ZJTEVfRk9STUFUX1dMR0w4QzdLTFEnKQ=='
 #       ) AS "_TMP"(
 #         "_COL1" TEXT, "_COL2" TEXT, "_COL3" TEXT,
@@ -157,7 +157,7 @@ dfCustTrxFraudRd = dfReader.csv(f"@{stage_name}/{FRAUD_TRANSACTIONS_CSV_GZ}")
 #   CAST("_COL9" AS INT) AS "TX_FRAUD_SCENARIO"
 # FROM
 #   "LOAD_DATA"(
-#     '@FRAUD_DATA/fraud_transactions.csv.gz',
+#     '@FRAUD_DATA/fraud_transactions.min.csv.gz',
 #     'KCAoRklMRV9GT1JNQVQgPT4gJyJ0ZXN0Ii4iUFVCTElDIi5TTk9XUEFSS19URU1QX0ZJTEVfRk9STUFUX1dMR0w4QzdLTFEnKQ=='
 #   ) AS "_TMP"(
 #     "_COL1" TEXT, "_COL2" TEXT, "_COL3" TEXT,
