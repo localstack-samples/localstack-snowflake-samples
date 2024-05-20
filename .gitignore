@@ -120,6 +120,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env*.localstack
+.env*.snowflake
 .env
 .venv
 env/
@@ -161,4 +163,11 @@ cython_debug/
 
 
 .DS_Store
-.idea/
+
+# JobLib
+**/*.joblib
+
+# Temporary data
+**/tempdata/*.csv
+**/tempdata/*.parquet
+**/tempdata/*.txt
