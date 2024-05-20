@@ -77,6 +77,17 @@ npm start
 
 You can now access the web application at http://localhost:3000.
 
+## Troubleshooting
+
+In case you're not able to access the web application, you can add the following entry to your `/etc/hosts` file:
+
+```text
+127.0.0.1       snowflake.localhost.localstack.cloud
+127.0.0.1       localhost.localstack.cloud
+```
+
+This will allow the Snowflake CLI to resolve the `snowflake.localhost.localstack.cloud` domain to the LocalStack Snowflake emulator.
+
 ## License
 
 This sample application is published under the Apache 2.0 License (see [`LICENSE`](../LICENSE) file).
