@@ -171,3 +171,5 @@ cython_debug/
 **/tempdata/*.csv
 **/tempdata/*.parquet
 **/tempdata/*.txt
+
+.idea/
