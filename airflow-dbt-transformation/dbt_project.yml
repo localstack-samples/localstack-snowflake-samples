@@ -1,0 +1,18 @@
+name: test_dbt
+models:
+  my_project:
+    # Applies to all files under models/example/
+    transform:
+      schema: transform
+      materialized: view
+    analysis:
+      schema: analysis
+      materialized: view
+
+seeds:
+  bookings_1:
+    enabled: true
+  bookings_2:
+    enabled: true
+  customers:
+    enabled: true
