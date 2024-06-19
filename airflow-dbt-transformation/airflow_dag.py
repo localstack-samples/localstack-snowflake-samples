@@ -4,8 +4,11 @@ from pathlib import Path
 
 from airflow import settings
 from airflow.models import Connection
-from cosmos import DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.decorators import dag, task
+from cosmos import DbtTaskGroup, DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
 from cosmos.profiles.snowflake.user_pass import SnowflakeUserPasswordProfileMapping
+from snowflake import connector
 
 dbt_project_path = Path("/opt/airflow/dags")
 
@@ -15,6 +18,16 @@ dbt_project_path = Path("/opt/airflow/dags")
 SnowflakeUserPasswordProfileMapping.airflow_param_mapping["host"] = "extra.host"
 SnowflakeUserPasswordProfileMapping.airflow_param_mapping["port"] = "extra.port"
 
+snowflake_connection_params = {
+    "user": "test",
+    "password": "test",
+    "host": "snowflake.localhost.localstack.cloud",
+    "port": 4566,
+    "account": "test",
+    "database": "test",
+    "schema": "public",
+}
+
 
 def create_snowflake_connection():
     conn = Connection(
@@ -23,13 +36,7 @@ def create_snowflake_connection():
         login="test",
         password="test",
         description="LocalStack Snowflake",
-        extra={
-            "host": "snowflake.localhost.localstack.cloud",
-            "port": 4566,
-            "account": "test",
-            "database": "test",
-            "schema": "public",
-        }
+        extra=snowflake_connection_params
     )
     session = settings.Session()
     conn_name = session.query(Connection).filter(Connection.conn_id == conn.conn_id).first()
@@ -53,13 +60,40 @@ profile_config = ProfileConfig(
     profile_mapping=credentials)
 
 dbt_executable = f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt"
-dbt_snowflake_dag = DbtDag(
-    project_config=ProjectConfig(dbt_project_path,),
-    operator_args={"install_deps": True},
-    profile_config=profile_config,
-    execution_config=ExecutionConfig(dbt_executable_path=dbt_executable,),
-    schedule_interval="@hourly",
-    start_date=datetime(2023, 9, 10),
+
+
+@dag(schedule_interval="@hourly",
+    start_date=datetime(2024, 6, 10),
     catchup=False,
-    dag_id="dbt_snowflake_dag"
+    dag_id="dbt_snowpark",
 )
+def dbt_snowpark_dag():
+    transform_data = DbtTaskGroup(
+        group_id="transform_data",
+        project_config=ProjectConfig(dbt_project_path),
+        profile_config=profile_config,
+        execution_config=ExecutionConfig(dbt_executable_path=dbt_executable),
+        operator_args={"install_deps": True},
+    )
+
+    intermediate = DummyOperator(task_id='intermediate')
+
+    @task
+    def query_result_data():
+        connection = connector.connect(**snowflake_connection_params)
+        # select rows from `PREPPED_DATA` view created by DBT transformation
+        result = connection.cursor().execute("SELECT * FROM PREPPED_DATA")
+        result = list(result)
+        print("-----")
+        print(f"Query result ({len(result)} rows):")
+        for row in result:
+            print(row)
+        print("-----")
+        result = str(result)
+        return result
+
+    query_result = query_result_data()
+    transform_data >> intermediate >> query_result
+
+
+dbt_snowpark_dag = dbt_snowpark_dag()
