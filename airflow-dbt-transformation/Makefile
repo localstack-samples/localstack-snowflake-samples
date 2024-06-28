@@ -6,13 +6,18 @@ install:    ## Install dependencies
 
 init:      ## Initialize the Airflow environment in LocalStack MWAA
 	awslocal s3 mb s3://snowflake-airflow
+	awslocal s3api put-bucket-versioning --bucket snowflake-airflow --versioning-configuration MFADelete=Disabled,Status=Enabled
+	awslocal s3 cp startup.sh s3://snowflake-airflow/startup.sh
+	@startup_version_id=$$(awslocal s3api list-object-versions --bucket snowflake-airflow --prefix startup.sh --query 'Versions[?IsLatest].[VersionId]' --output text) && \
 	awslocal mwaa create-environment --dag-s3-path /dags \
 		--execution-role-arn arn:aws:iam::000000000000:role/airflow-role \
 		--network-configuration {} \
 		--source-bucket-arn arn:aws:s3:::snowflake-airflow \
-		--airflow-configuration-options agent.code=007,agent.name=bond \
+		--airflow-configuration-options agent.code=007,agent.name=bond,env.LOCALSTACK_RESOLVE_IP_ADDRESS=172.20.0.2 \
 		--name my-mwaa-env \
-		--endpoint-url http://localhost.localstack.cloud:4566
+		--endpoint-url http://localhost.localstack.cloud:4566 \
+		--startup-script-s3-path startup.sh \
+		--startup-script-s3-object-version $$startup_version_id
 
 deploy:     ## Deploy the DAG to the local Airflow instance
 	awslocal s3 cp requirements.txt s3://snowflake-airflow/
