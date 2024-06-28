@@ -4,9 +4,9 @@ from pathlib import Path
 
 from airflow import settings
 from airflow.models import Connection
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.empty import EmptyOperator
 from airflow.decorators import dag, task
-from cosmos import DbtTaskGroup, DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig
 from cosmos.profiles.snowflake.user_pass import SnowflakeUserPasswordProfileMapping
 from snowflake import connector
 
@@ -76,7 +76,7 @@ def dbt_snowpark_dag():
         operator_args={"install_deps": True},
     )
 
-    intermediate = DummyOperator(task_id='intermediate')
+    intermediate = EmptyOperator(task_id='intermediate')
 
     @task
     def query_result_data():

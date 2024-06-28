@@ -17,7 +17,7 @@ The code is based on the Snowflake Guide for [Data Engineering with Apache Airfl
 Start the LocalStack Snowflake emulator using the following command:
 
 ```bash
-DOCKER_FLAGS='-e SF_LOG=trace' \
+DOCKER_FLAGS='-e SF_LOG=trace --network localstack --name=localhost.localstack.cloud --network-alias=snowflake.localhost.localstack.cloud' \
   IMAGE_NAME=localstack/snowflake \
   DEBUG=1 \
   localstack start
