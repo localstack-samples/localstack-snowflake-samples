@@ -1,0 +1,14 @@
+ data_source local_snowflake:
+   type: snowflake
+   connection:
+     username: test
+     password: test
+     account: test
+     database: test
+     warehouse: test
+     schema: public
+     host: snowflake.localhost.localstack.cloud
+     port: 4566
+     session_parameters:
+       QUERY_TAG: soda-queries
+       QUOTED_IDENTIFIERS_IGNORE_CASE: false

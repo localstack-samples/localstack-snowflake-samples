@@ -1,0 +1,12 @@
+   checks for test_table:
+   # Checks that dataset contains fewer than 2 rows; written to fail
+     - row_count < 2:
+         name: Dataset is unreasonably small
+   # Checks that column contains no NULL values
+     - missing_count(name) = 0:
+         name: No NULL values
+   # Checks for columns removed or added, or changed type or index
+     - schema:
+         warn:
+           when schema changes: any
+         name: No changes to schema
