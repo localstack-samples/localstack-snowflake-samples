@@ -9,9 +9,27 @@ The code is based on the Snowflake Quickstart Guide on [Data Quality Testing wit
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal) 
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
-- [`snow` CLI](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/) with `local` connection profile pointing to LocalStack Snowflake
+- [`snow` CLI](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/) with `localstack` connection profile pointing to LocalStack Snowflake
+
+To install the `snow` CLI with a local connection profile, follow the instructions [here](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/#create-a-connection-profile).
+It basically boils down to running this command:
+```
+snow connection add \
+    --connection-name localstack \
+    --user test \
+    --password test \
+    --account test \
+    --host snowflake.localhost.localstack.cloud
+```
 
 ## Instructions
+
+### Install dependencies
+
+Run the following command to install dependencies for the project (into a local Python virtual environment):
+```
+make install
+```
 
 ### Start LocalStack
 
