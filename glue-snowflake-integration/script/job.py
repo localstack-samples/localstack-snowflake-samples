@@ -14,7 +14,6 @@ spark = glueContext.spark_session
 logger = glueContext.get_logger()
 job = Job(glueContext)
 java_import(spark._jvm, SNOWFLAKE_SOURCE_NAME)
-## uj = sc._jvm.net.snowflake.spark.snowflake
 spark._jvm.net.snowflake.spark.snowflake.SnowflakeConnectorUtils.enablePushdownSession(spark._jvm.org.apache.spark.sql.SparkSession.builder().getOrCreate())
 sfOptions = {
     "sfURL" : "https://dummy.snowflakecomputing.com",
