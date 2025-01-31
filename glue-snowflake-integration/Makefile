@@ -3,7 +3,7 @@ usage:			## Shows usage for this Makefile
 
 
 start:			## Start the localstack
-	DEBUG=1 localstack start;
+	DOCKER_FLAGS='-v ./init.sf.sql:/etc/localstack/init/ready.d/init.sf.sql' IMAGE_NAME=localstack/snowflake localstack start;
 
 stop:			## Stop the localstack
 	localstack stop
