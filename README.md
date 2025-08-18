@@ -28,7 +28,7 @@ To check out a single sample, you can use the following commands:
 ```bash
 mkdir localstack-snowflake-samples && cd localstack-snowflake-samples
 git init
-git remote add origin -f git@github.com:localstack/localstack-pro-samples.git
+git remote add origin -f git@github.com:localstack/localstack-snowflake-samples.git
 git config core.sparseCheckout true
 echo <LOCALSTACK_SAMPLE_DIRECTORY_NAME> >> .git/info/sparse-checkout
 git pull origin master
