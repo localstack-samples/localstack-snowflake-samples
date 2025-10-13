@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  localstack-snowflake:
+    container_name: "localstack-snowflake"
+    image: localstack/snowflake:latest
+    networks:
+      - localstack
+    ports:
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4510-4559:4510-4559"
+      - "127.0.0.1:443:443"
+    environment:
+      - DEBUG=true # set to "true" to enable debug logging
+      - AWS_ACCESS_KEY_ID=access-key
+      - AWS_DEFAULT_REGION=us-west-2
+      - AWS_SECRET_ACCESS_KEY=secret-key
+      - AWS_SESSION_TOKEN=token
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
+      - SF_HOSTNAME_REGEX=localstack-snowflake.*
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal s3api list-buckets"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - "./volume:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  localstack:
+    container_name: "localstack-aws"
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - DEBUG=${DEBUG:-0}
+    volumes:
+      - "./volume:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - localstack
+
+networks:
+  localstack:
+    external: false
+    driver: bridge
+    name: localstack
