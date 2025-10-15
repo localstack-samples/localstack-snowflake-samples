@@ -1,11 +1,11 @@
 # LocalStack Multi-Container Setup
 
-This sample demonstrates how to run LocalStack Snowflake and LocalStack AWS in separate Docker containers with proper networking configuration.
+This sample demonstrates how to run LocalStack for Snowflake and LocalStack for AWS in separate Docker containers with proper networking configuration.
 
 ## Architecture
 
 This setup uses Docker Compose to run two containers:
-- `localstack-snowflake`: LocalStack Snowflake emulator (exposed on port 4567)
+- `localstack-snowflake`: LocalStack for Snowflake emulator (exposed on port 4567)
 - `localstack-aws`: LocalStack AWS emulator (exposed on port 4566)
 
 Both containers are connected through a Docker bridge network named `localstack`.
@@ -19,8 +19,6 @@ The `SF_HOSTNAME_REGEX` environment variable is critical for proper Snowflake co
 ```yaml
 SF_HOSTNAME_REGEX=localstack-snowflake.*
 ```
-
-This regex pattern tells LocalStack Snowflake to accept connections using the container name `localstack-snowflake` as the hostname. Without this configuration, the Snowflake connector would only accept connections to localhost or 127.0.0.1, which wouldn't work for inter-container communication.
 
 The pattern `localstack-snowflake.*` matches:
 - `localstack-snowflake` (exact container name)
@@ -53,10 +51,10 @@ This will accept connections from any hostname, which can be useful for developm
 
 ## Testing Connectivity
 
-To verify that the LocalStack AWS container can successfully communicate with the LocalStack Snowflake container, run the following command:
+To verify that the LocalStack for AWS container can successfully communicate with the LocalStack for Snowflake container, run the following command:
 
 ```bash
-docker exec localstack-aws curl -d '{}' localstack-snowflake:4566/session
+docker exec localstack-aws curl -d '{}' localstack-snowflake:4567/session
 ```
 
 ### Expected Result
