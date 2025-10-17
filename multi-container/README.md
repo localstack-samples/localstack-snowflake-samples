@@ -90,6 +90,33 @@ If you don't see `{"success": true}`, check:
    docker-compose logs localstack
    ```
 
+## Cross-Container Integration: Loading Data from S3 to Snowflake
+
+While this basic setup demonstrates container networking, loading data from an S3 bucket in `localstack-aws` to a database in `localstack-snowflake` requires additional configuration. Specifically, you'll need to configure the S3 endpoint settings so that Snowflake knows how to reach the AWS emulator:
+
+### Required Additional Configuration
+
+Add these environment variables to the `localstack-snowflake` service in `docker-compose.yml`:
+
+```yaml
+environment:
+  - SF_S3_ENDPOINT=http://localstack-aws:4566
+  - SF_S3_ENDPOINT_EXTERNAL=http://localhost:4566
+```
+
+- `SF_S3_ENDPOINT`: Internal endpoint for Snowflake container to access S3 within the Docker network
+- `SF_S3_ENDPOINT_EXTERNAL`: External endpoint for accessing S3 from your host machine
+
+### Example Workflow
+
+Once configured, you can:
+
+1. Create an S3 bucket and upload data in LocalStack AWS
+2. Create a Snowflake stage pointing to the S3 bucket
+3. Use `COPY INTO` commands to load data from S3 into Snowflake tables
+
+For detailed instructions on S3 integration and other cross-service capabilities, see the references below.
+
 ## Clean Up
 
 Stop and remove containers:
@@ -102,3 +129,8 @@ Remove volumes:
 docker-compose down -v
 rm -rf ./volume
 ```
+
+## References
+
+- [LocalStack for Snowflake Configuration](https://docs.localstack.cloud/snowflake/capabilities/configuration/) - Comprehensive configuration options including S3 endpoints and network settings
+- [LocalStack Multi-Service Networking](https://docs.localstack.cloud/references/network-troubleshooting/) - Network troubleshooting and configuration for multi-container setups

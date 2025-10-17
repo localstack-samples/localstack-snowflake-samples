@@ -20,7 +20,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - "./volume:/var/lib/localstack"
+      - "./volume/snowflake:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
 
   localstack-aws:
@@ -31,7 +31,7 @@ services:
     environment:
       - DEBUG=${DEBUG:-0}
     volumes:
-      - "./volume:/var/lib/localstack"
+      - "./volume/aws:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - localstack
