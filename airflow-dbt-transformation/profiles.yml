@@ -1,0 +1,12 @@
+# example profiles.yml file
+local:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      host: snowflake.localhost.localstack.cloud
+      database: test
+      user: test
+      password: test
+      schema: public
+      account: test

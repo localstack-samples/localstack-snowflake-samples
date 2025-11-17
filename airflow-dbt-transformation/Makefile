@@ -6,6 +6,7 @@ install:    ## Install dependencies
 
 init:      ## Initialize the Airflow environment in LocalStack MWAA
 	awslocal s3 mb s3://snowflake-airflow
+	docker rm -f localstack-mwaa-000000000000-us-east-1-my-mwaa-env
 	awslocal mwaa create-environment --dag-s3-path /dags \
 		--execution-role-arn arn:aws:iam::000000000000:role/airflow-role \
 		--network-configuration {} \
@@ -22,4 +23,4 @@ deploy:     ## Deploy the DAG to the local Airflow instance
 	awslocal s3 cp --recursive seeds s3://snowflake-airflow/dags/seeds
 	awslocal s3 cp airflow_dag.py s3://snowflake-airflow/dags/
 
-.PHONY: usage install deploy start
+.PHONY: usage install init deploy

@@ -1,0 +1,4 @@
+package-lock.yml
+dbt_packages/
+.user.yml
+

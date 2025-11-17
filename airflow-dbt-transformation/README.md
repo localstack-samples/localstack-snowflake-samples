@@ -30,7 +30,7 @@ The sample application provides Makefile targets to simplify the setup process.
 
 Run the following command to initialize the Airflow environment in LocalStack (this may take a couple of seconds):
 ```
-make init  
+make init
 ```
 
 After deploying the Airflow environment, you should be able to request its details, and extract the webserver URL:
@@ -51,6 +51,7 @@ make deploy
 
 Once the Airflow environment has spun up, and the DAG has been successfully deployed, you should be able to access the Airflow UI under http://localhost.localstack.cloud:4510/home
 (Note that the port number may be different - make sure to copy the `WebserverUrl` from the output further above.)
+You can use `localstack`/`localstack` as the username/password to log into the Airflow UI.
 
 You can now trigger a DAG run from the UI. If all goes well, the DAG execution result should look something similar to this:
 
