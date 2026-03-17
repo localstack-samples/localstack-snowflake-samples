@@ -33,20 +33,10 @@ make install
 
 ## Start LocalStack
 
-Start LocalStack:
-
-```bash
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
-
-To run this sample with custom Snowflake logging flags, use:
+To start LocalStack with custom Snowflake logging flags, use:
 
 ```bash
 DOCKER_FLAGS='-e SF_LOG=trace' \
-  IMAGE_NAME=localstack/snowflake \
   DEBUG=1 \
   localstack start -s snowflake -d
 ```
@@ -56,14 +46,16 @@ DOCKER_FLAGS='-e SF_LOG=trace' \
 The sample application provides Makefile targets to simplify the setup process.
 
 Run the following command to initialize the environment and seed test data into local Snowflake:
-```
+
+```bash
 make init
 ```
 
 ## Use Soda to run data quality checks
 
 Once the test data has been set up, we can run the Soda data quality checks via this command:
-```
+
+```bash
 make scan
 ```
 
