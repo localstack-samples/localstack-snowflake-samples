@@ -15,7 +15,7 @@ This sample demonstrates how to run LocalStack for Snowflake and LocalStack for 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -d
+localstack start -s snowflake -d
 localstack wait -t 30
 ```
 

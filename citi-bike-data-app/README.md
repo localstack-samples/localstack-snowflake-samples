@@ -33,7 +33,7 @@ Start LocalStack:
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -d
+localstack start -s snowflake -d
 localstack wait -t 30
 ```
 
@@ -43,7 +43,7 @@ For this sample, you can also run the emulator with custom flags:
 DOCKER_FLAGS='-e DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=demo-citibike-data.s3.amazonaws.com -e SF_LOG=trace -e SF_CSV_IMPORT_MAX_ROWS=20000' \
 IMAGE_NAME=localstack/snowflake \
 DEBUG=1 \
-localstack start
+localstack start -s snowflake -d
 ```
 
 In the above command, we set the `DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM` environment variable to resolve the `demo-citibike-data.s3.amazonaws.com` domain to the real S3 service, in order to download the Citibike data. We also set the `SF_CSV_IMPORT_MAX_ROWS` to `20000` to limit the number of rows imported from the CSV file (for testing purposes).

@@ -24,7 +24,7 @@ Open the `credit-scoring-eda.ipynb` notebook and run the cells to see the result
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -d
+localstack start -s snowflake -d
 localstack wait -t 30
 ```
 

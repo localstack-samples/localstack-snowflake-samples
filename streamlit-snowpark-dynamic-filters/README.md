@@ -75,7 +75,7 @@ host = "snowflake.localhost.localstack.cloud"
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -d
+localstack start -s snowflake -d
 localstack wait -t 30
 ```
 

@@ -19,7 +19,7 @@ Start LocalStack:
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -d
+localstack start -s snowflake -d
 localstack wait -t 30
 ```
 
@@ -30,7 +30,7 @@ docker network create --attachable --subnet 172.20.0.0/24 localstack
 DOCKER_FLAGS='-e SF_LOG=trace --network localstack --name=localhost.localstack.cloud --network-alias=snowflake.localhost.localstack.cloud' \
   IMAGE_NAME=localstack/snowflake \
   DEBUG=1 \
-  localstack start
+  localstack start -s snowflake -d
 ```
 
 ## Deploy the app
