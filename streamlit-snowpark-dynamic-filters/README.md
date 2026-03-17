@@ -23,6 +23,7 @@ The app connects to Snowflake and retrieves the data using snowpark Python, push
 To run the app, following steps are required:
 
 ## Prerequisites
+
 - A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
