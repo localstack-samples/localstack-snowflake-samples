@@ -5,7 +5,7 @@ An E-Commerce company aims to apply machine learning for understanding customer 
 In this sample notebook, we will explore how you can use LocalStack's Snowflake emulator to develop and test your Snowflake data pipelines entirely on your local machine! In this notebook, we will showcase how you can use LocalStack's Snowflake with Snowpark for Python and your favorite Python libraries for data analysis and machine learning.
 
 ## Prerequisites
-
+- A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 -   [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 -   [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
@@ -20,6 +20,15 @@ jupyter notebook
 ```
 
 Open the `linear-regression-model.ipynb` notebook and run the cells to see the results. Follow the instructions in the notebook to install the required packages and set up the Snowflake emulator.
+
+## Start LocalStack
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+localstack auth set-token $LOCALSTACK_AUTH_TOKEN
+localstack start -d
+localstack wait -t 30
+```
 
 ## License
 

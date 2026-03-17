@@ -1,13 +1,13 @@
-# Demo: Soda data quality checks with LocalStack Snowflake 
+# Demo: Soda data quality checks with LocalStack Snowflake
 
 This project illustrates how to use the [Soda framework](https://www.soda.io/) to run data quality checks against Snowflake tables, entirely on your local machine.
 
 The code is based on the Snowflake Quickstart Guide on [Data Quality Testing with Soda](https://quickstarts.snowflake.com/guide/soda).
 
 ## Prerequisites
-
+- A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
-- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal) 
+- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [`snow` CLI](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/) with `localstack` connection profile pointing to LocalStack Snowflake
 
@@ -24,16 +24,25 @@ snow connection add \
 
 ## Instructions
 
-### Install dependencies
+## Install dependencies
 
 Run the following command to install dependencies for the project (into a local Python virtual environment):
 ```
 make install
 ```
 
-### Start LocalStack
+## Start LocalStack
 
-Start the LocalStack Snowflake emulator using the following command:
+Start LocalStack:
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+localstack auth set-token $LOCALSTACK_AUTH_TOKEN
+localstack start -d
+localstack wait -t 30
+```
+
+To run this sample with custom Snowflake logging flags, use:
 
 ```bash
 DOCKER_FLAGS='-e SF_LOG=trace' \
@@ -42,16 +51,16 @@ DOCKER_FLAGS='-e SF_LOG=trace' \
   localstack start
 ```
 
-### Initialize the data tables
+## Initialize the data tables
 
-The sample application provides Makefile targets to simplify the setup process. 
+The sample application provides Makefile targets to simplify the setup process.
 
 Run the following command to initialize the environment and seed test data into local Snowflake:
 ```
-make init  
+make init
 ```
 
-### Use Soda to run data quality checks
+## Use Soda to run data quality checks
 
 Once the test data has been set up, we can run the Soda data quality checks via this command:
 ```

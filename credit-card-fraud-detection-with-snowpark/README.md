@@ -1,5 +1,22 @@
 # Credit Card Fraud detection with Snowflake & LocalStack
 
+## Prerequisites
+
+- A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- [Docker](https://docs.docker.com/get-docker/)
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)
+- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+
+## Start LocalStack
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+localstack auth set-token $LOCALSTACK_AUTH_TOKEN
+localstack start -d
+localstack wait -t 30
+```
+
 ## Overview
 
 This example is based on the Machine Learning for Credit Card Fraud detection
