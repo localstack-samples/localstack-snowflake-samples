@@ -4,7 +4,7 @@ This sample demonstrates how to run LocalStack for Snowflake and LocalStack for 
 
 ## Prerequisites
 
-- A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [Docker](https://docs.docker.com/get-docker/)
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)

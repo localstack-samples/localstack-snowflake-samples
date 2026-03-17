@@ -3,7 +3,7 @@
 This notebook demonstrates how to use Snowpark for Python to perform exploratory data analysis (EDA) on a credit scoring dataset. This notebook uses LocalStack's Snowflake emulator to run Snowflake data pipelines locally.
 
 ## Prerequisites
-- A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)

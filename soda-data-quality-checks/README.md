@@ -5,7 +5,7 @@ This project illustrates how to use the [Soda framework](https://www.soda.io/) t
 The code is based on the Snowflake Quickstart Guide on [Data Quality Testing with Soda](https://quickstarts.snowflake.com/guide/soda).
 
 ## Prerequisites
-- A valid [LocalStack for Snowflake license](https://snowflake.localstack.cloud/). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
