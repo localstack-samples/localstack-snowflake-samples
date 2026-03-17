@@ -18,8 +18,7 @@ Start LocalStack with the custom Snowflake/Airflow networking flags:
 
 ```bash
 docker network create --attachable --subnet 172.20.0.0/24 localstack
-DOCKER_FLAGS='-e SF_LOG=trace --network localstack --name=localhost.localstack.cloud --network-alias=snowflake.localhost.localstack.cloud' \
-  IMAGE_NAME=localstack/snowflake \
+DOCKER_FLAGS='-e SF_LOG=trace --network localstack --name=localhost.localstack.cloud --network-alias=snowflake.localhost.localstack.cloud'
   DEBUG=1 \
   localstack start -s snowflake -d
 ```
