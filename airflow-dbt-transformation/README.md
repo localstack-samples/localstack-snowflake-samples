@@ -14,16 +14,7 @@ The code is based on the Snowflake Guide for [Data Engineering with Apache Airfl
 
 ## Start LocalStack
 
-Start LocalStack:
-
-```bash
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
-
-If you want to run this sample with the custom Snowflake/Airflow networking flags, use:
+Start LocalStack with the custom Snowflake/Airflow networking flags:
 
 ```bash
 docker network create --attachable --subnet 172.20.0.0/24 localstack
