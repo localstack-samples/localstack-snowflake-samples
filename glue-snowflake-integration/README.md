@@ -25,6 +25,7 @@ glue-snowflake-integration/
 
 1. **Start LocalStack with Snowflake Emulator**
    ```bash
+   export LOCALSTACK_AUTH_TOKEN=....
    make start
    ```
    This command starts LocalStack with the Snowflake emulator enabled. The `init.sf.sql` script is automatically mounted and executed to create the necessary Snowflake objects.
@@ -43,15 +44,6 @@ glue-snowflake-integration/
    ```bash
    make stop
    ```
-
-## Start LocalStack
-
-```bash
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
 
 ## Snowflake Initialization
 
