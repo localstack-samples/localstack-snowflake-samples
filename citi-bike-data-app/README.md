@@ -28,20 +28,10 @@ You can follow the instructions below to run the application manually.
 
 ## Start LocalStack
 
-Start LocalStack:
-
-```bash
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
-
-For this sample, you can also run the emulator with custom flags:
+Start LocalStack with custom flags:
 
 ```bash
 DOCKER_FLAGS='-e DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=demo-citibike-data.s3.amazonaws.com -e SF_LOG=trace -e SF_CSV_IMPORT_MAX_ROWS=20000' \
-IMAGE_NAME=localstack/snowflake \
 DEBUG=1 \
 localstack start -s snowflake -d
 ```
