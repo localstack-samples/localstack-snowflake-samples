@@ -10,15 +10,6 @@ This sample demonstrates how to run LocalStack for Snowflake and LocalStack for 
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
-## Start LocalStack
-
-```bash
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
-
 ## Architecture
 
 This setup uses Docker Compose to run two containers:
