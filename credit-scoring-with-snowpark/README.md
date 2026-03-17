@@ -9,6 +9,15 @@ This notebook demonstrates how to use Snowpark for Python to perform exploratory
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 - [Jupyter Notebook](https://jupyter.org/)
 
+## Start LocalStack
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+localstack auth set-token $LOCALSTACK_AUTH_TOKEN
+localstack start -s snowflake -d
+localstack wait -t 30
+```
+
 ## Running the notebook
 
 Start the LocalStack container using your preferred method. Ensure that you have access to LocalStack's Snowflake emulator. Start a Jupyter Notebook server and open the notebook in your browser.
@@ -18,15 +27,6 @@ jupyter notebook
 ```
 
 Open the `credit-scoring-eda.ipynb` notebook and run the cells to see the results. Follow the instructions in the notebook to install the required packages and set up the Snowflake emulator.
-
-## Start LocalStack
-
-```bash
-export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
 
 ## License
 
