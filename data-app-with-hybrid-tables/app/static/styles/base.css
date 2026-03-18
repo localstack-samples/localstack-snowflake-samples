@@ -1,0 +1,241 @@
+.autocomplete-suggestions {
+    background-color: #ffffffaa;
+}
+
+
+#view-source {
+    position: fixed;
+    display: block;
+    right: 0;
+    bottom: 0;
+    margin-right: 40px;
+    margin-bottom: 40px;
+    z-index: 900;
+  }
+  .demo-list-item {
+    height: 95px;
+    margin-bottom: 10px;
+  }
+  .cut-text { 
+    text-overflow: ellipsis;
+    overflow: hidden; 
+    white-space: nowrap;
+  }
+  .mini-chip {
+    height:15px;
+    line-height: normal;
+    padding-top: 3px;
+  }
+  .mini-chip > .mdl-chip__text {
+    font-size: 10px;
+    vertical-align:bottom;
+  }
+  .mdl-list {
+    margin-top: 0px;
+  }
+
+  input[type="date"]:not(.has-value):before {
+    color: lightgray;
+    content: attr(placeholder);
+  }
+  .mdl-card {
+    height: max-content;
+  }
+  .label-fill-color-1 {
+    color: #ACEC00;
+  }
+  .label-fill-color-2 {
+    color: #00BBD6;
+  }
+  .label-fill-color-3 {
+    color: #BA65C9;
+  }
+  .label-fill-color-4 {
+    color: #EF3C79;
+  }
+  .label-fill-color-5 {
+    color: #40c4ff;
+  }
+  .label-color-1 {
+    background-color: #ACEC00;
+  }
+  .label-color-2 {
+    background-color: #00BBD6;
+  }
+  .label-color-3 {
+    background-color: #BA65C9;
+  }
+  .label-color-4 {
+    background-color: #EF3C79;
+  }
+  .label-color-5 {
+    background-color: #40c4ff;
+  }
+  .label-enabled {
+    opacity: 1;
+  }
+  .label-disabled {
+    opacity: 0.25;
+  }
+
+.app-icon {
+  opacity: 0.5;
+}
+.user-icon {
+  font-size: 16px;
+}
+
+.tasks-cards {
+-webkit-align-items: flex-start;
+    -ms-flex-align: start;
+        align-items: flex-start;
+-webkit-align-content: flex-start;
+    -ms-flex-line-pack: start;
+        align-content: flex-start;
+}
+.tasks-cards .card-separator {
+height: 16px;
+}
+.tasks-cards .mdl-card__title.mdl-card__title {
+color: white;
+font-size: 24px;
+font-weight: 400;
+}
+
+
+.task-edit .mdl-card__title {
+    min-height: 100px;
+}
+
+.task-edit .task-id {
+    display: hidden;
+}
+
+.task-edit .mdl-button {
+    opacity: 0.5;
+}
+
+.task-edit .mdl-button:hover {
+    opacity: 1;
+}
+
+
+.task-list-item {
+    margin-bottom: 16px;
+}
+
+.task-list-item:hover {
+    background-color: #e1f5fe !important;
+}
+
+.task-list-item .task-list-item-title > a {
+    text-decoration: none;
+    color: black;
+}
+
+.mdl-list__item--three-line {
+    height: auto;
+}
+
+.task-list-item .mdl-list__item-primary-content {
+    height: auto;
+}
+
+.task-list-item .mdl-list__item-secondary-action {
+    opacity: 0.5;
+}
+
+.task-list-item .mdl-list__item-secondary-action:hover {
+    opacity: 1;
+}
+
+
+
+.task-list ul {
+    padding: 0;
+}
+.tasks-edit2 h3 {
+    font-size: 1em;
+}
+
+
+.mdl-menu__item a {
+  text-decoration: none;
+  color: rgba(0,0,0,.87);
+}
+
+
+
+.cool-card {
+  min-height: 20px;
+  padding: 5px;
+}
+
+.cool-card {
+  opacity: 0.75;
+}
+
+.cool-card:hover {
+  opacity: 1;
+}
+
+.task_list_card {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.task_list_card_actions{
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
+  margin-bottom: 5px;
+}
+
+.task_list_card_actions .mdl-button{
+  margin-right: 5px
+}
+
+.task_list_card_content{
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  width: calc(100% - 115px);
+}
+
+
+.task_list_card_content a {
+  text-decoration: none;
+  color: rgba(0,0,0,.87);
+}
+
+.mini-chip a span {
+  font-size: 10px;
+  vertical-align:bottom;
+}
+
+.mdl-card__title button {
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 0;
+}
+
+.mdl-layout-title a {
+  text-decoration: none;
+  color: rgba(0,0,0,.87);
+}
+
+.task-drawer-header {
+  box-sizing: border-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-justify-content: flex-end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  padding: 16px;
+  height: 151px;
+}
