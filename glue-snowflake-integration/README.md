@@ -15,7 +15,7 @@ glue-snowflake-integration/
 ```
 
 ## Prerequisites
-
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - Docker
@@ -25,6 +25,7 @@ glue-snowflake-integration/
 
 1. **Start LocalStack with Snowflake Emulator**
    ```bash
+   export LOCALSTACK_AUTH_TOKEN=....
    make start
    ```
    This command starts LocalStack with the Snowflake emulator enabled. The `init.sf.sql` script is automatically mounted and executed to create the necessary Snowflake objects.
@@ -68,4 +69,4 @@ The `init.sf.sql` script automatically creates and populates a sample table in t
 
 - The environment uses LocalStack's Snowflake emulator, which provides a subset of Snowflake functionality suitable for testing
 - All AWS resources are created locally through Terraform
-- The deployment script (`deploy.sh`) handles the entire workflow from infrastructure setup to job execution 
+- The deployment script (`deploy.sh`) handles the entire workflow from infrastructure setup to job execution

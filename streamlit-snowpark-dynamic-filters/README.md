@@ -24,6 +24,7 @@ To run the app, following steps are required:
 
 ## Prerequisites
 
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
@@ -31,7 +32,7 @@ To run the app, following steps are required:
 
 Note: Snowpark requires python 3.8.*, please ensure that you have that version available in your environment.
 
-### Poetry
+## Poetry
 
 The project is using [poetry](https://python-poetry.org/) to manage the dependencies and local CI.
 
@@ -42,13 +43,13 @@ To set up the project:
 3. (optional) to force the use of python 3.8, run `poetry env use /path/to/python3.8`
 4. Run `poetry install` to install dependencies into project-specific virtual environment
 
-### pip
+## pip
 
 As an alternative to `poetry`, the project can also be set up via `pip`:
 
 1. Create a python 3.8 virtual environment
 2. Switch into the created virtual environment
-3. Use provided `requirements.txt` to install the dependencies: `pip -r requirements.txt` 
+3. Use provided `requirements.txt` to install the dependencies: `pip -r requirements.txt`
 
 ## Streamlit connection details
 
@@ -68,6 +69,15 @@ database = "STREAMLIT_DEMO"
 schema = "STREAMLIT_USER_PROFILER"
 role = "test"
 host = "snowflake.localhost.localstack.cloud"
+```
+
+## Start LocalStack
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+localstack auth set-token $LOCALSTACK_AUTH_TOKEN
+localstack start -s snowflake -d
+localstack wait -t 30
 ```
 
 ## Data setup in LocalStack Snowflake

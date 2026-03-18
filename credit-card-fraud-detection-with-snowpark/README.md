@@ -10,18 +10,27 @@ engineering with Snowpark, preparing data for training a Machine Learning model
 and finally how to deploy and use a trained model in Snowflake using Python UDF
 — all on your local machine!
 
+## Prerequisites
+
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- [Docker](https://docs.docker.com/get-docker/)
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)
+- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+
+## Start LocalStack
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+localstack auth set-token $LOCALSTACK_AUTH_TOKEN
+localstack start -s snowflake -d
+localstack wait -t 30
+```
+
 ## Getting Started
 
 This guide assumes you have already cloned the GitHub repository, and have a
 terminal context within this directory.
-
--  Docker with access to Docker Hub
--  Python 3.8 installed locally
--  [`localstack`
-   CLI](https://docs.localstack.cloud/getting-started/installation/) with
-   `LOCALSTACK_AUTH_TOKEN` environment variable set
--  [LocalStack Snowflake
-   emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
 1.  Check that dependencies exist:
 

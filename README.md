@@ -1,37 +1,55 @@
-# Examples & use-cases around LocalStack for Snowflake
+# LocalStack for Snowflake Samples
 
-This repository contains sample projects that can be deployed on LocalStack for Snowflake to demonstrate how to use the Snowflake emulator to develop and test data applications locally.
+This repository contains sample projects that can be deployed on LocalStack for Snowflake to demonstrate local development and testing workflows for Snowflake data applications.
 
-## Pre-requisites
+## Prerequisites
 
-Each samples project has its own pre-requisites. Please refer to the `README.md` file in each project for more information. In general, you will need the following:
+- A valid [LocalStack for Snowflake license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- [Docker](https://docs.docker.com/get-docker/)
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)
+- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
-* [Docker](https://docs.docker.com/get-docker/) installed 
-* [LocalStack CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
-- [LocalStack for Snowflake](https://snowflake.localstack.cloud/getting-started/installation/)
+## Configuration
+
+Set your auth token before running any sample:
+
+```bash
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+```
+
+Alternatively, use the LocalStack CLI:
+
+```bash
+localstack auth set-token <your-auth-token>
+```
 
 ## Outline
 
-| Project Name                                                                                          | Description                                                                                               |
-|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| [citi-bike-data-app](./citi-bike-data-app)                                                            | A sample application that demonstrates how to seed Citibike data into Snowflake and query the data using a web server. |
-| [credit-card-fraud-detection-with-snowpark](./credit-card-fraud-detection-with-snowpark)              | A sample application that demonstrates how to use Snowpark to query credit card fraud data in Snowflake.   |
-| [credit-scoring-with-snowpark](./credit-scoring-with-snowpark)                                        | A sample application that demonstrates how to use Snowpark to query credit scoring data in Snowflake.      |
-| [lambda-snowpark-connector](./lambda-snowpark-connector)                                                  | A sample application that demonstrates how to use Snowpark in an AWS Lambda function to query data in Snowflake. |
-| [predicting-customer-spend](./predicting-customer-spend)                                              | A sample application that demonstrates how to use Snowpark to query customer spend data in Snowflake.      |
-| [streamlit-snowpark-dynamic-filters](./streamlit-snowpark-dynamic-filters)                            | A sample application that demonstrates how to use Snowpark to query data in Snowflake and visualize the data using Streamlit. |
+| Project Name | Description |
+|---|---|
+| [airflow-dbt-transformation](./airflow-dbt-transformation) | Run local data transformation pipelines with Airflow, dbt, and Snowpark. |
+| [citi-bike-data-app](./citi-bike-data-app) | Seed Citibike data into Snowflake and query it from a web application. |
+| [credit-card-fraud-detection-with-snowpark](./credit-card-fraud-detection-with-snowpark) | Feature engineering and ML-oriented fraud workflows with Snowpark. |
+| [credit-scoring-with-snowpark](./credit-scoring-with-snowpark) | Exploratory data analysis for credit scoring using Snowpark. |
+| [glue-snowflake-integration](./glue-snowflake-integration) | Integrate AWS Glue ETL jobs with Snowflake in a local environment. |
+| [lambda-snowpark-connector](./lambda-snowpark-connector) | Use Snowpark from an AWS Lambda function running on LocalStack. |
+| [multi-container](./multi-container) | Run LocalStack for Snowflake and LocalStack AWS emulation in separate containers. |
+| [predicting-customer-spend](./predicting-customer-spend) | Predict customer spend using Snowpark and Python ML tooling. |
+| [soda-data-quality-checks](./soda-data-quality-checks) | Execute Soda data quality checks against local Snowflake tables. |
+| [streamlit-snowpark-dynamic-filters](./streamlit-snowpark-dynamic-filters) | Streamlit application with dynamic Snowpark-powered filters. |
 
-## Checking out a single sample
+## Checking Out A Single Sample
 
-To check out a single sample, you can use the following commands:
+To check out only one sample directory:
 
 ```bash
 mkdir localstack-snowflake-samples && cd localstack-snowflake-samples
 git init
-git remote add origin -f git@github.com:localstack/localstack-snowflake-samples.git
+git remote add origin -f git@github.com:localstack-samples/localstack-snowflake-samples.git
 git config core.sparseCheckout true
 echo <LOCALSTACK_SAMPLE_DIRECTORY_NAME> >> .git/info/sparse-checkout
 git pull origin master
 ```
 
-The above commands use `sparse-checkout` to only pull the sample you are interested in. You can find the name of the sample directory in the table above.
+The commands above use sparse checkout to pull only the sample you need.

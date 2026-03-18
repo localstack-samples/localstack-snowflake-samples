@@ -7,7 +7,7 @@ Note: This sample application has been copied and adapted from its original vers
 The demo features a single-page web application (powered by Node.js) displaying several charts. The chart data is sourced from Snowflake using Citibike data. The web server backend connects to the LocalStack Snowflake emulation running locally via the Node.js Snowflake SDK.
 
 ## Prerequisites
-
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [Snowflake CLI](https://github.com/snowflakedb/snowflake-cli) with a `local` profile configured (more details below)
@@ -26,20 +26,19 @@ make web-start
 
 You can follow the instructions below to run the application manually.
 
-### Start LocalStack
+## Start LocalStack
 
-Start the LocalStack Snowflake emulator using the following command:
+Start LocalStack with custom flags:
 
 ```bash
 DOCKER_FLAGS='-e DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=demo-citibike-data.s3.amazonaws.com -e SF_LOG=trace -e SF_CSV_IMPORT_MAX_ROWS=20000' \
-IMAGE_NAME=localstack/snowflake \
 DEBUG=1 \
-localstack start
+localstack start -s snowflake -d
 ```
 
 In the above command, we set the `DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM` environment variable to resolve the `demo-citibike-data.s3.amazonaws.com` domain to the real S3 service, in order to download the Citibike data. We also set the `SF_CSV_IMPORT_MAX_ROWS` to `20000` to limit the number of rows imported from the CSV file (for testing purposes).
 
-### Install the dependencies
+## Install the dependencies
 
 Run the following command to install the dependencies:
 
@@ -47,7 +46,7 @@ Run the following command to install the dependencies:
 npm install
 ```
 
-### Configure Snowflake CLI
+## Configure Snowflake CLI
 
 To seed the Citibike data into Snowflake, you need to configure the Snowflake CLI with a `local` profile. You can use the following command to create a new profile:
 
@@ -66,7 +65,7 @@ To test the connection, you can run the following command:
 snow connection test --connection local
 ```
 
-### Seed the Citibike data
+## Seed the Citibike data
 
 Run the following command to seed the Citibike data into Snowflake:
 
@@ -78,7 +77,7 @@ snow sql -c local --query 'create or replace table weather(STATE TEXT,OBSERVATIO
 snow sql -c local --query 'copy into weather from @demo_data file_format=(type=csv skip_header=1) PATTERN = '"'"'weather__0_2_0.*csv.*'"'"
 ```
 
-### Start the web server
+## Start the web server
 
 Start the web server using the following command:
 

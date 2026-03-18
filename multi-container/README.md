@@ -2,6 +2,14 @@
 
 This sample demonstrates how to run LocalStack for Snowflake and LocalStack for AWS in separate Docker containers with proper networking configuration.
 
+## Prerequisites
+
+- A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- [Docker](https://docs.docker.com/get-docker/)
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)
+- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+
 ## Architecture
 
 This setup uses Docker Compose to run two containers:
@@ -12,7 +20,7 @@ Both containers are connected through a Docker bridge network named `localstack`
 
 ## Important Configuration
 
-### SF_HOSTNAME_REGEX
+## SF_HOSTNAME_REGEX
 
 The `SF_HOSTNAME_REGEX` environment variable is critical for proper Snowflake connectivity within the Docker network:
 
@@ -57,7 +65,7 @@ To verify that the LocalStack for AWS container can successfully communicate wit
 docker exec localstack-aws curl -d '{}' localstack-snowflake:4567/session
 ```
 
-### Expected Result
+## Expected Result
 
 ```json
 {"success": true}
@@ -68,7 +76,7 @@ This confirms that:
 - The `SF_HOSTNAME_REGEX` is correctly matching the container name
 - The Snowflake emulator is accepting connections
 
-### Troubleshooting
+## Troubleshooting
 
 If you don't see `{"success": true}`, check:
 
@@ -94,7 +102,7 @@ If you don't see `{"success": true}`, check:
 
 While this basic setup demonstrates container networking, loading data from an S3 bucket in `localstack-aws` to a database in `localstack-snowflake` requires additional configuration. Specifically, you'll need to configure the S3 endpoint settings so that Snowflake knows how to reach the AWS emulator:
 
-### Required Additional Configuration
+## Required Additional Configuration
 
 Add these environment variables to the `localstack-snowflake` service in `docker-compose.yml`:
 
@@ -107,7 +115,7 @@ environment:
 - `SF_S3_ENDPOINT`: Internal endpoint for Snowflake container to access S3 within the Docker network
 - `SF_S3_ENDPOINT_EXTERNAL`: External endpoint for accessing S3 from your host machine
 
-### Example Workflow
+## Example Workflow
 
 Once configured, you can:
 
