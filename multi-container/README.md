@@ -20,25 +20,18 @@ Both containers are connected through a Docker bridge network named `localstack`
 
 ## Important Configuration
 
-## SF_HOSTNAME_REGEX
+## SF_HOSTNAMES
 
-The `SF_HOSTNAME_REGEX` environment variable is critical for proper Snowflake connectivity within the Docker network:
-
-```yaml
-SF_HOSTNAME_REGEX=localstack-snowflake.*
-```
-
-The pattern `localstack-snowflake.*` matches:
-- `localstack-snowflake` (exact container name)
-- Any hostname starting with `localstack-snowflake` (e.g., with domain suffixes)
-
-**Alternative Configuration:** You can also use just `.*` in `SF_HOSTNAME_REGEX` to match any hostname string, which provides maximum flexibility:
+The `SF_HOSTNAMES` environment variable lists the hostnames the Snowflake emulator answers to:
 
 ```yaml
-SF_HOSTNAME_REGEX=.*
+SF_HOSTNAMES=localstack-snowflake,snowflake.localhost.localstack.cloud
 ```
 
-This will accept connections from any hostname, which can be useful for development environments or when you need to support multiple container names or DNS configurations.
+- `localstack-snowflake` is the container name, used by the AWS container inside the Docker network.
+- `snowflake.localhost.localstack.cloud` is the default hostname, used by clients on your machine.
+
+When `SF_HOSTNAMES` is not set, the emulator only answers to hostnames containing `snowflake.`, which does not match the container name. Older versions used `SF_HOSTNAME_REGEX` for this.
 
 ## Getting Started
 
@@ -49,12 +42,12 @@ This will accept connections from any hostname, which can be useful for developm
 
 2. Start the containers:
    ```bash
-   docker-compose up -d
+   docker compose up -d --wait
    ```
 
 3. Verify containers are running:
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 ## Testing Connectivity
@@ -62,8 +55,10 @@ This will accept connections from any hostname, which can be useful for developm
 To verify that the LocalStack for AWS container can successfully communicate with the LocalStack for Snowflake container, run the following command:
 
 ```bash
-docker exec localstack-aws curl -d '{}' localstack-snowflake:4567/session
+docker exec localstack-aws python3 -c "import urllib.request; print(urllib.request.urlopen(urllib.request.Request('http://localstack-snowflake:4567/session', data=b'{}')).read().decode())"
 ```
+
+The `localstack/localstack` image does not include `curl`, so the request is sent with Python.
 
 ## Expected Result
 
@@ -73,7 +68,7 @@ docker exec localstack-aws curl -d '{}' localstack-snowflake:4567/session
 
 This confirms that:
 - The Docker network is properly configured
-- The `SF_HOSTNAME_REGEX` is correctly matching the container name
+- `SF_HOSTNAMES` routes the container name to the Snowflake emulator
 - The Snowflake emulator is accepting connections
 
 ## Troubleshooting
@@ -82,7 +77,7 @@ If you don't see `{"success": true}`, check:
 
 1. Both containers are running:
    ```bash
-   docker-compose ps
+   docker compose ps
    ```
 
 2. The containers are on the same network:
@@ -90,21 +85,17 @@ If you don't see `{"success": true}`, check:
    docker network inspect localstack
    ```
 
-3. The SF_HOSTNAME_REGEX is set correctly in docker-compose.yml
+3. `SF_HOSTNAMES` is set correctly in `docker-compose.yml`
 
 4. Check container logs:
    ```bash
-   docker-compose logs localstack-snowflake
-   docker-compose logs localstack
+   docker compose logs localstack-snowflake
+   docker compose logs localstack-aws
    ```
 
 ## Cross-Container Integration: Loading Data from S3 to Snowflake
 
-While this basic setup demonstrates container networking, loading data from an S3 bucket in `localstack-aws` to a database in `localstack-snowflake` requires additional configuration. Specifically, you'll need to configure the S3 endpoint settings so that Snowflake knows how to reach the AWS emulator:
-
-## Required Additional Configuration
-
-Add these environment variables to the `localstack-snowflake` service in `docker-compose.yml`:
+Loading data from an S3 bucket in `localstack-aws` into a table in `localstack-snowflake` needs the Snowflake emulator to know how to reach the AWS emulator. `docker-compose.yml` sets this up:
 
 ```yaml
 environment:
@@ -117,11 +108,13 @@ environment:
 
 ## Example Workflow
 
-Once configured, you can:
+With this configuration, you can:
 
 1. Create an S3 bucket and upload data in LocalStack AWS
 2. Create a Snowflake stage pointing to the S3 bucket
 3. Use `COPY INTO` commands to load data from S3 into Snowflake tables
+
+`make test` runs both checks: the session request from the AWS container, and a CSV loaded from an S3 bucket into a Snowflake table through a stage.
 
 For detailed instructions on S3 integration and other cross-service capabilities, see the references below.
 
@@ -129,12 +122,12 @@ For detailed instructions on S3 integration and other cross-service capabilities
 
 Stop and remove containers:
 ```bash
-docker-compose down
+docker compose down
 ```
 
 Remove volumes:
 ```bash
-docker-compose down -v
+docker compose down -v
 rm -rf ./volume
 ```
 

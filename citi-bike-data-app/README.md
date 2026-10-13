@@ -31,12 +31,14 @@ You can follow the instructions below to run the application manually.
 Start LocalStack with custom flags:
 
 ```bash
-DOCKER_FLAGS='-e DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=demo-citibike-data.s3.amazonaws.com -e SF_LOG=trace -e SF_CSV_IMPORT_MAX_ROWS=20000' \
-DEBUG=1 \
-localstack start -s snowflake -d
+LOCALSTACK_DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=demo-citibike-data.s3.amazonaws.com \
+LOCALSTACK_SF_LOG=trace \
+LOCALSTACK_SF_CSV_IMPORT_MAX_ROWS=20000 \
+LOCALSTACK_DEBUG=1 \
+lstk start --type snowflake
 ```
 
-In the above command, we set the `DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM` environment variable to resolve the `demo-citibike-data.s3.amazonaws.com` domain to the real S3 service, in order to download the Citibike data. We also set the `SF_CSV_IMPORT_MAX_ROWS` to `20000` to limit the number of rows imported from the CSV file (for testing purposes).
+`lstk` passes `LOCALSTACK_`-prefixed variables to the container without the prefix. In the above command, we set the `DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM` environment variable to resolve the `demo-citibike-data.s3.amazonaws.com` domain to the real S3 service, in order to download the Citibike data. We also set the `SF_CSV_IMPORT_MAX_ROWS` to `20000` to limit the number of rows imported from the CSV file (for testing purposes).
 
 ## Install the dependencies
 
@@ -70,11 +72,11 @@ snow connection test --connection local
 Run the following command to seed the Citibike data into Snowflake:
 
 ```bash
-snow sql -c local --query "create stage demo_data url='s3://demo-citibike-data'"
-snow sql -c local --query 'create or replace table trips(tripduration integer,starttime timestamp,stoptime timestamp,start_station_id integer,end_station_id integer,bikeid integer,usertype string,birth_year integer,gender integer);'
-snow sql -c local --query 'copy into trips from @demo_data file_format=(type=csv skip_header=1) PATTERN = '"'"'trips__0_0_0.*csv.*'"'"
-snow sql -c local --query 'create or replace table weather(STATE TEXT,OBSERVATION_DATE DATE,DAY_OF_YEAR NUMBER,TEMP_MIN_F NUMBER,TEMP_MAX_F NUMBER,TEMP_AVG_F NUMBER,TEMP_MIN_C FLOAT,TEMP_MAX_C FLOAT,TEMP_AVG_C FLOAT,TOT_PRECIP_IN NUMBER,TOT_SNOWFALL_IN NUMBER,TOT_SNOWDEPTH_IN NUMBER,TOT_PRECIP_MM NUMBER,TOT_SNOWFALL_MM NUMBER,TOT_SNOWDEPTH_MM NUMBER);'
-snow sql -c local --query 'copy into weather from @demo_data file_format=(type=csv skip_header=1) PATTERN = '"'"'weather__0_2_0.*csv.*'"'"
+snow sql -c local --database test --schema public --query "create stage demo_data url='s3://demo-citibike-data'"
+snow sql -c local --database test --schema public --query 'create or replace table trips(tripduration integer,starttime timestamp,stoptime timestamp,start_station_id integer,end_station_id integer,bikeid integer,usertype string,birth_year integer,gender integer);'
+snow sql -c local --database test --schema public --query 'copy into trips from @demo_data file_format=(type=csv skip_header=1) PATTERN = '"'"'trips__0_0_0.*csv.*'"'"
+snow sql -c local --database test --schema public --query 'create or replace table weather(STATE TEXT,OBSERVATION_DATE DATE,DAY_OF_YEAR NUMBER,TEMP_MIN_F NUMBER,TEMP_MAX_F NUMBER,TEMP_AVG_F NUMBER,TEMP_MIN_C FLOAT,TEMP_MAX_C FLOAT,TEMP_AVG_C FLOAT,TOT_PRECIP_IN NUMBER,TOT_SNOWFALL_IN NUMBER,TOT_SNOWDEPTH_IN NUMBER,TOT_PRECIP_MM NUMBER,TOT_SNOWFALL_MM NUMBER,TOT_SNOWDEPTH_MM NUMBER);'
+snow sql -c local --database test --schema public --query 'copy into weather from @demo_data file_format=(type=csv skip_header=1) PATTERN = '"'"'weather__0_2_0.*csv.*'"'"
 ```
 
 ## Start the web server
@@ -86,6 +88,10 @@ npm start
 ```
 
 You can now access the web application at http://localhost:3000.
+
+## Test the app
+
+`make test` seeds the data, starts the web server and checks that the page and the three chart endpoints (`/trips/monthly`, `/trips/day_of_week`, `/trips/temperature`) return data from Snowflake.
 
 ![](images/citibike_trips_app.png)
 

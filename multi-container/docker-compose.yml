@@ -17,7 +17,7 @@ services:
       - SF_S3_ENDPOINT=http://localstack-aws:4566
       - SF_S3_ENDPOINT_EXTERNAL=http://localhost:4566
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:4567/_localstack/health"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4567/_localstack/health')"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -34,7 +34,7 @@ services:
       - DEBUG=${DEBUG:-0}
       - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:-}
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:4566/_localstack/health"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4566/_localstack/health')"]
       interval: 10s
       timeout: 5s
       retries: 12

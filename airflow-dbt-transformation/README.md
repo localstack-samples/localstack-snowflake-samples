@@ -6,7 +6,7 @@ The code is based on the Snowflake Guide for [Data Engineering with Apache Airfl
 
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
@@ -14,20 +14,20 @@ The code is based on the Snowflake Guide for [Data Engineering with Apache Airfl
 
 ## Start LocalStack
 
-Start LocalStack with the custom Snowflake/Airflow networking flags:
+Start LocalStack for Snowflake:
 
 ```bash
-docker network create --attachable --subnet 172.20.0.0/24 localstack
-DOCKER_FLAGS='-e SF_LOG=trace --network localstack --name=localhost.localstack.cloud --network-alias=snowflake.localhost.localstack.cloud'
-  DEBUG=1 \
-  localstack start -s snowflake -d
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+make start
 ```
+
+This runs `lstk start --type snowflake`. The Airflow container that MWAA starts uses LocalStack's DNS server, so it reaches `snowflake.localhost.localstack.cloud` without a custom Docker network.
 
 ## Deploy the app
 
 The sample application provides Makefile targets to simplify the setup process.
 
-Run the following command to initialize the Airflow environment in LocalStack (this may take a couple of seconds):
+Run the following command to initialize the Airflow environment in LocalStack (this may take a couple of seconds). The DAG uses Airflow 2 APIs, so the environment is created with Airflow 2.10.3:
 ```
 make init
 ```

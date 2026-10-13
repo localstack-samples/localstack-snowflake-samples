@@ -16,7 +16,7 @@ glue-snowflake-integration/
 
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - Docker
 - Make
@@ -28,7 +28,7 @@ glue-snowflake-integration/
    export LOCALSTACK_AUTH_TOKEN=....
    make start
    ```
-   This command starts LocalStack with the Snowflake emulator enabled. The `init.sf.sql` script is automatically mounted and executed to create the necessary Snowflake objects.
+   This command runs `lstk start`, which reads `.lstk/config.toml`: it starts the Snowflake emulator and mounts the `init.sf.sql` script as a ready hook, which creates the necessary Snowflake objects.
 
 2. **Deploy and Run the Glue Job**
    ```bash
@@ -62,7 +62,8 @@ The `init.sf.sql` script automatically creates and populates a sample table in t
 
 - `make start` - Start LocalStack with Snowflake emulator
 - `make stop` - Stop LocalStack
-- `make deploy` - Deploy and test the Glue job
+- `make deploy` - Deploy and run the Glue job
+- `make test` - Deploy and run the Glue job, then check its CloudWatch logs for the JDBC session with the Snowflake emulator
 - `make usage` - Display available make commands
 
 ## Notes

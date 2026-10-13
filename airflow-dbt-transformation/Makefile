@@ -15,8 +15,10 @@ logs:       ## Show the LocalStack logs
 
 init:      ## Initialize the Airflow environment in LocalStack MWAA
 	awslocal s3 mb s3://snowflake-airflow
+	awslocal s3 cp requirements.txt s3://snowflake-airflow/
 	-docker rm -f localstack-mwaa-000000000000-us-east-1-my-mwaa-env
-	awslocal mwaa create-environment --dag-s3-path /dags \
+	awslocal mwaa create-environment --dag-s3-path dags \
+		--requirements-s3-path requirements.txt \
 		--execution-role-arn arn:aws:iam::000000000000:role/airflow-role \
 		--network-configuration {} \
 		--source-bucket-arn arn:aws:s3:::snowflake-airflow \

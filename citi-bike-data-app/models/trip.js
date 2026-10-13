@@ -57,7 +57,7 @@ Trip.countByTemperature = (start_date, end_date, cb) => {
   if (start_date && end_date) {
     var sql = 'with weather_trips as (select * from trips t ' +
                     'inner join weather w ' +
-                    'on date_trunc("day", t.starttime) = w.observation_date) ' +
+                    'on date_trunc(\'day\', t.starttime) = w.observation_date) ' +
                     'select round(temp_avg_f, -1) as temp, count(*) as trip_count ' +
                     'from weather_trips ' +
                     'where starttime between ? and ? ' +
@@ -67,7 +67,7 @@ Trip.countByTemperature = (start_date, end_date, cb) => {
   } else {
     var sql = 'with weather_trips as (select * from trips t ' +
                     'inner join weather w ' +
-                    'on date_trunc("day", t.starttime) = w.observation_date) ' +
+                    'on date_trunc(\'day\', t.starttime) = w.observation_date) ' +
                     'select round(temp_avg_f, -1) as temp, count(*) as trip_count ' +
                     'from weather_trips ' +
                     'group by round(temp_avg_f, -1) ' +
