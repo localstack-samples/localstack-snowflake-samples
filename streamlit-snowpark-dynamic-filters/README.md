@@ -95,6 +95,14 @@ After performing the setup and switching to the virtual environment, you can run
 
 `streamlit run main.py`
 
+## Testing
+
+`make test` loads the demo data, starts the app in a `python:3.8-slim-bullseye` container and runs `tests/smoke_test.py`, which builds the three filters the way `main.py` does, applies them and checks the result against the same filter written in SQL.
+
+## Known issue
+
+The result preview calls `.sample(n=5)`, which runs `SELECT ... FROM (<subquery>) SAMPLE (5 ROWS)`. The Snowflake emulator currently rejects `SAMPLE` on a subquery, so the preview shows an error in the app. The smoke test reports this and checks the preview data with `LIMIT` instead.
+
 ## License
 
 This sample application is published under the Apache 2.0 License (see `LICENSE` file).
