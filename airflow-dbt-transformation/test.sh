@@ -35,7 +35,10 @@ airflow() { docker exec "$CONTAINER" airflow "$@"; }
 
 dag_loaded() { airflow dags list -o json 2>/dev/null | jq -e --arg d $DAG_ID 'any(.[]; .dag_id == $d)' > /dev/null; }
 if ! poll "the DAG to be loaded" 60 10 dag_loaded; then
+  airflow dags list -o json || true
   airflow dags list-import-errors || true
+  docker exec "$CONTAINER" bash -c 'echo "AIRFLOW_HOME=$AIRFLOW_HOME"; ls -la "$AIRFLOW_HOME" "$AIRFLOW_HOME/dags" 2>&1; which dbt' || true
+  docker logs --tail 100 "$CONTAINER" || true
   exit 1
 fi
 echo "PASS: the $DAG_ID DAG is loaded"

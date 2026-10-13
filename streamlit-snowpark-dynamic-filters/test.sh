@@ -10,7 +10,7 @@ PORT=${PORT:-8501}
 make init
 
 docker rm -f $CONTAINER > /dev/null 2>&1 || true
-docker run -d --name $CONTAINER --network host -v "$PWD:/app" -w /app python:3.8-slim \
+docker run -d --name $CONTAINER --network host -v "$PWD:/app" -w /app python:3.8-slim-bullseye \
   bash -c "pip install -q -r requirements.txt && streamlit run main.py --server.headless true --server.port $PORT" > /dev/null
 trap 'docker logs --tail 50 $CONTAINER; docker rm -f $CONTAINER > /dev/null' EXIT
 

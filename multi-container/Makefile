@@ -11,6 +11,7 @@ stop:		## Stop and remove both containers
 	docker compose down
 
 logs:		## Show the logs of both containers
+	docker inspect --format '{{json .State.Health}}' localstack-aws localstack-snowflake
 	docker logs --tail 150 localstack-aws
 	docker logs --tail 150 localstack-snowflake
 

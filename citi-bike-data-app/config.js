@@ -5,7 +5,7 @@
  *    instance
  */
 var config = {
-//  snowflake_account: 'test',
+  snowflake_account: 'test',
   snowflake_user: 'test',
   // note: this is only a generated test key, can be shared publicly
   snowflake_private_key: `-----BEGIN RSA PRIVATE KEY-----

@@ -9,5 +9,5 @@
    # time ("when schema changes") need a Soda Cloud account to store history.
      - schema:
          fail:
-           when required column missing: [id, name]
+           when required column missing: [ID, NAME]
          name: Required columns present
