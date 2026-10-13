@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -59,7 +60,10 @@ profile_config = ProfileConfig(
     target_name="dev",
     profile_mapping=credentials)
 
-dbt_executable = f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt"
+# use a dedicated dbt virtualenv if the environment has one, otherwise the dbt
+# installed from requirements.txt
+dbt_venv_executable = f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt"
+dbt_executable = dbt_venv_executable if os.path.exists(dbt_venv_executable) else shutil.which("dbt")
 
 
 @dag(schedule_interval="@hourly",

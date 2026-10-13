@@ -4,6 +4,8 @@ export APP_VERSION ?= $(shell git rev-parse --short HEAD)
 export GIT_REPO_ROOT ?= $(shell git rev-parse --show-toplevel)
 
 export DOCKER_IMAGE_NAME ?= localstack-credit-card-fraud-detection
+# Flags for `docker run`; CI has no TTY, so it sets this to an empty value
+DOCKER_RUN_FLAGS ?= -it
 
 check:
 	@echo "Checking system dependencies..."
@@ -16,6 +18,17 @@ check:
 	echo $$(make --version)
 	# Docker version 26.0.0, build 2ae903e
 	echo $$(docker --version)
+
+install: build
+
+start:
+	lstk start --type snowflake --non-interactive --timeout 3m
+
+logs:
+	lstk logs --tail 300
+
+test:
+	./test.sh
 
 build:
 	docker build \
@@ -50,7 +63,7 @@ endif
 localstack-run: build
 	docker run \
 		--rm \
-		-it \
+		$(DOCKER_RUN_FLAGS) \
 		-v ./:/app \
 		--env-file=.env.localstack \
 		--net=host \
@@ -65,7 +78,7 @@ localstack-run: build
 snowflake-run: build
 	docker run \
 		--rm \
-		-it \
+		$(DOCKER_RUN_FLAGS) \
 		-v ./:/app \
 		--env-file=.env.snowflake \
 		--net=host \

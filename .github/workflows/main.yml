@@ -1,0 +1,87 @@
+name: Test samples
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    name: ${{ matrix.sample }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        sample:
+          - airflow-dbt-transformation
+          - citi-bike-data-app
+          - credit-card-fraud-detection-with-snowpark
+          - credit-scoring-with-snowpark
+          - glue-snowflake-integration
+          - lambda-snowpark-connector
+          - multi-container
+          - predicting-customer-spend
+          - soda-data-quality-checks
+          - streamlit-snowpark-dynamic-filters
+    defaults:
+      run:
+        working-directory: ${{ matrix.sample }}
+    env:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Terraform
+        if: matrix.sample == 'glue-snowflake-integration'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Install lstk and the Snowflake and AWS CLIs
+        run: |
+          npm install -g @localstack/lstk
+          pip install snowflake-cli awscli-local terraform-local
+          for name in localstack local; do
+            snow connection add --connection-name $name --user test --password test \
+              --account test --host snowflake.localhost.localstack.cloud --no-interactive
+          done
+
+      - name: Install sample dependencies
+        run: make install
+
+      - name: Start LocalStack for Snowflake
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        # samples whose `start` target runs the app name this target start-localstack
+        run: |
+          if grep -q '^start-localstack:' Makefile; then make start-localstack; else make start; fi
+
+      - name: Run tests
+        run: make test
+
+      - name: Show LocalStack logs
+        if: failure()
+        run: make logs || true

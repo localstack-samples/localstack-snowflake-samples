@@ -57,8 +57,9 @@ resource "aws_s3_bucket" "glue_assets" {
 resource "aws_glue_job" "glue_job" {
   name         = "glue-job"
   role_arn     = aws_iam_role.glue_execution_role.arn
-  glue_version = "4.0"
-  worker_type  = "G.1X"
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
   command {
     name            = "glueetl"
     python_version  = "3"

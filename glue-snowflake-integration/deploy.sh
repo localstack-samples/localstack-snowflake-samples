@@ -1,12 +1,13 @@
 #!/bin/bash
+set -euo pipefail
 
 # Root Directory
 ROOT_DIR=$(pwd)
 
 echo "🚀 Initializing Terraform..."
 cd tf
-tflocal init > /dev/null 2>&1
-tflocal apply --auto-approve > /dev/null 2>&1
+tflocal init -input=false > /dev/null
+tflocal apply -input=false --auto-approve > /dev/null
 
 # Get Outputs
 bucket_name=$(tflocal output -raw bucket_name)
@@ -45,7 +46,7 @@ JOB_STATUS=$(awslocal glue get-job-run --job-name $job_name --run-id $job_run_id
 
 while [[ "$JOB_STATUS" != "SUCCEEDED" && "$JOB_STATUS" != "FAILED" && "$JOB_STATUS" != "STOPPED" ]]; do
   echo "⏳ Job is still running..."
-  sleep 2
+  sleep 5
   JOB_STATUS=$(awslocal glue get-job-run --job-name $job_name --run-id $job_run_id --query 'JobRun.JobRunState' --output text)
 done
 
@@ -54,6 +55,10 @@ if [[ "$JOB_STATUS" == "SUCCEEDED" ]]; then
   echo "🎉 Job finished successfully!"
 elif [[ "$JOB_STATUS" == "FAILED" ]]; then
   echo "❌ Job failed!"
+  exit 1
 else
   echo "⏹️ Job stopped!"
+  exit 1
 fi
+
+echo "$job_run_id" > .last-job-run-id

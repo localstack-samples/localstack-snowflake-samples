@@ -1,0 +1,7 @@
+# lstk configuration for this sample: start the Snowflake emulator and mount
+# init.sf.sql as a ready hook, so the src_glue table exists once it is up.
+[[containers]]
+type = "snowflake"
+tag  = "latest"
+port = "4566"
+volumes = ["../init.sf.sql:/etc/localstack/init/ready.d/init.sf.sql"]

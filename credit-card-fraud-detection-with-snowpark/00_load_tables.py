@@ -94,79 +94,10 @@ dfReader = session.read.schema(dfCustTrxFraudSchema)
 # Get the data into the data frame
 dfCustTrxFraudRd = dfReader.csv(f"@{stage_name}/{FRAUD_TRANSACTIONS_CSV_GZ}")
 
-########## BEGIN LOCALSTACK WORKAROUND ##########
-
-# NOTE: Stop execution before this line, using `import ipdb; ipdb.set_trace()`,
-# and run the commented-out SQL solution manually, before continuing execution.
-
-# # Write the dataframe in a table
-# ret = dfCustTrxFraudRd.write.mode("overwrite").saveAsTable(
-#     "CUSTOMER_TRANSACTIONS_FRAUD"
-# )
-
-# Currently, the commented-out line of Python runs the following SQL against
-# PostgreSQL:
-#
-# ```sql
-# CREATE TABLE "CUSTOMER_TRANSACTIONS_FRAUD" (
-#   "TRANSACTION_ID", "TX_DATETIME",
-#   "CUSTOMER_ID", "TERMINAL_ID", "TX_AMOUNT" NOT NULL,
-#   "TX_TIME_SECONDS", "TX_TIME_DAYS",
-#   "TX_FRAUD", "TX_FRAUD_SCENARIO"
-# ) AS
-# SELECT
-#   *
-# FROM
-#   (
-#     SELECT
-#       CAST("_COL1" AS INT) AS "TRANSACTION_ID",
-#       CAST("_COL2" AS TIMESTAMP) AS "TX_DATETIME",
-#       CAST("_COL3" AS INT) AS "CUSTOMER_ID",
-#       CAST("_COL4" AS INT) AS "TERMINAL_ID",
-#       CAST("_COL5" AS REAL) AS "TX_AMOUNT",
-#       CAST("_COL6" AS INT) AS "TX_TIME_SECONDS",
-#       CAST("_COL7" AS INT) AS "TX_TIME_DAYS",
-#       CAST("_COL8" AS INT) AS "TX_FRAUD",
-#       CAST("_COL9" AS INT) AS "TX_FRAUD_SCENARIO"
-#     FROM
-#       "LOAD_DATA"(
-#         '@FRAUD_DATA/fraud_transactions.min.csv.gz',
-#         'KCAoRklMRV9GT1JNQVQgPT4gJyJ0ZXN0Ii4iUFVCTElDIi5TTk9XUEFSS19URU1QX0ZJTEVfRk9STUFUX1dMR0w4QzdLTFEnKQ=='
-#       ) AS "_TMP"(
-#         "_COL1" TEXT, "_COL2" TEXT, "_COL3" TEXT,
-#         "_COL4" TEXT, "_COL5" TEXT, "_COL6" TEXT,
-#         "_COL7" TEXT, "_COL8" TEXT, "_COL9" TEXT
-#       )
-#   ) AS _tmp
-# ```
-#
-# Instead, connect to the underlying PostgreSQL instance, and run this SQL
-# instead:
-#
-# ```sql
-# CREATE TABLE "CUSTOMER_TRANSACTIONS_FRAUD" AS
-# SELECT
-#   CAST("_COL1" AS INT) AS "TRANSACTION_ID",
-#   CAST("_COL2" AS TIMESTAMP) AS "TX_DATETIME",
-#   CAST("_COL3" AS INT) AS "CUSTOMER_ID",
-#   CAST("_COL4" AS INT) AS "TERMINAL_ID",
-#   CAST("_COL5" AS REAL) AS "TX_AMOUNT",
-#   CAST("_COL6" AS INT) AS "TX_TIME_SECONDS",
-#   CAST("_COL7" AS INT) AS "TX_TIME_DAYS",
-#   CAST("_COL8" AS INT) AS "TX_FRAUD",
-#   CAST("_COL9" AS INT) AS "TX_FRAUD_SCENARIO"
-# FROM
-#   "LOAD_DATA"(
-#     '@FRAUD_DATA/fraud_transactions.min.csv.gz',
-#     'KCAoRklMRV9GT1JNQVQgPT4gJyJ0ZXN0Ii4iUFVCTElDIi5TTk9XUEFSS19URU1QX0ZJTEVfRk9STUFUX1dMR0w4QzdLTFEnKQ=='
-#   ) AS "_TMP"(
-#     "_COL1" TEXT, "_COL2" TEXT, "_COL3" TEXT,
-#     "_COL4" TEXT, "_COL5" TEXT, "_COL6" TEXT,
-#     "_COL7" TEXT, "_COL8" TEXT, "_COL9" TEXT
-#   );
-# ```
-
-########## END LOCALSTACK WORKAROUND ##########
+# Write the dataframe in a table
+ret = dfCustTrxFraudRd.write.mode("overwrite").saveAsTable(
+    "CUSTOMER_TRANSACTIONS_FRAUD"
+)
 
 # Read the data from the staging area and create CUSTOMER_TRANSACTIONS_FRAUD,
 # CUSTOMERS and TERMINALS tables

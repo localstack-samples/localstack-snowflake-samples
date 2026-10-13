@@ -4,9 +4,18 @@ usage:		## Shows usage for this Makefile
 install:    ## Install dependencies
 	which awslocal || pip install 'awscli-local[ver1]'
 
+start:      ## Start LocalStack for Snowflake
+	LOCALSTACK_SF_LOG=trace LOCALSTACK_DEBUG=1 lstk start --type snowflake --non-interactive --timeout 3m
+
+stop:       ## Stop LocalStack
+	lstk stop
+
+logs:       ## Show the LocalStack logs
+	lstk logs --tail 300
+
 init:      ## Initialize the Airflow environment in LocalStack MWAA
 	awslocal s3 mb s3://snowflake-airflow
-	docker rm -f localstack-mwaa-000000000000-us-east-1-my-mwaa-env
+	-docker rm -f localstack-mwaa-000000000000-us-east-1-my-mwaa-env
 	awslocal mwaa create-environment --dag-s3-path /dags \
 		--execution-role-arn arn:aws:iam::000000000000:role/airflow-role \
 		--network-configuration {} \
@@ -23,4 +32,7 @@ deploy:     ## Deploy the DAG to the local Airflow instance
 	awslocal s3 cp --recursive seeds s3://snowflake-airflow/dags/seeds
 	awslocal s3 cp airflow_dag.py s3://snowflake-airflow/dags/
 
-.PHONY: usage install init deploy
+test:       ## Create the Airflow environment, deploy the DAG, run it and check the result
+	./test.sh
+
+.PHONY: usage install start stop logs init deploy test
