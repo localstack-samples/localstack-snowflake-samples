@@ -26,6 +26,7 @@ airflow() { docker exec "$CONTAINER" airflow "$@" 2>/dev/null; }
 diagnostics() {
   docker exec "$CONTAINER" bash -c 'ls -la /opt/airflow/dags; pip show astronomer-cosmos dbt-snowflake 2>&1 | grep -E "^(Name|Version)"' || true
   docker exec "$CONTAINER" airflow dags list-import-errors || true
+  docker exec "$CONTAINER" bash -c 'tail -n 40 $(find /opt/airflow/logs -path "*query_result_data*" -name "*.log" | head -1)' || true
   docker logs --tail 80 "$CONTAINER" 2>&1 | grep -v SyntaxWarning || true
 }
 trap 'if [ $? -ne 0 ]; then diagnostics; fi' EXIT
