@@ -1,3 +1,5 @@
+AIRFLOW_CONTAINER = localstack-mwaa-000000000000-us-east-1-my-mwaa-env
+
 usage:		## Shows usage for this Makefile
 	@cat Makefile | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
@@ -16,26 +18,29 @@ logs:       ## Show the LocalStack logs
 init:      ## Initialize the Airflow environment in LocalStack MWAA
 	awslocal s3 mb s3://snowflake-airflow
 	awslocal s3 cp requirements.txt s3://snowflake-airflow/
-	-docker rm -f localstack-mwaa-000000000000-us-east-1-my-mwaa-env
-	awslocal mwaa create-environment --dag-s3-path dags \
-		--requirements-s3-path requirements.txt \
+	-docker rm -f $(AIRFLOW_CONTAINER)
+	awslocal mwaa create-environment --dag-s3-path /dags \
+		--requirements-s3-path /requirements.txt \
 		--execution-role-arn arn:aws:iam::000000000000:role/airflow-role \
 		--network-configuration {} \
 		--source-bucket-arn arn:aws:s3:::snowflake-airflow \
 		--airflow-configuration-options agent.code=007,agent.name=bond \
 		--name my-mwaa-env \
-		--airflow-version 2.10.3 \
 		--endpoint-url http://localhost.localstack.cloud:4566
 
-deploy:     ## Deploy the DAG to the local Airflow instance
+deploy:     ## Deploy the DAG and the dbt project to the local Airflow instance
 	awslocal s3 cp requirements.txt s3://snowflake-airflow/
 	awslocal s3 cp packages.yml s3://snowflake-airflow/dags/
 	awslocal s3 cp dbt_project.yml s3://snowflake-airflow/dags/
 	awslocal s3 cp --recursive models s3://snowflake-airflow/dags/models
 	awslocal s3 cp --recursive seeds s3://snowflake-airflow/dags/seeds
+	awslocal s3 cp --recursive macros s3://snowflake-airflow/dags/macros
 	awslocal s3 cp airflow_dag.py s3://snowflake-airflow/dags/
+
+restart:    ## Restart the Airflow services so they pick up the synced DAG and dependencies
+	docker exec $(AIRFLOW_CONTAINER) supervisorctl restart all
 
 test:       ## Create the Airflow environment, deploy the DAG, run it and check the result
 	./test.sh
 
-.PHONY: usage install start stop logs init deploy test
+.PHONY: usage install start stop logs init deploy restart test
