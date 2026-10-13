@@ -7,7 +7,7 @@ PORT=${PORT:-3000}
 
 make seed
 
-count() { snow sql -c local --format json -q "SELECT COUNT(*) AS N FROM $1" | jq -r '.. | objects | .N? // empty' | head -1; }
+count() { snow sql -c local --format json -q "SELECT COUNT(*) AS N FROM test.public.$1" | jq -r '.. | objects | .N? // empty' | head -1; }
 trips=$(count trips)
 weather=$(count weather)
 echo "Loaded $trips trips and $weather weather rows"

@@ -85,23 +85,35 @@ snowflake-run: build
 		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
 		bash -c "$(RUN_ARGS)"
 
-update-deps:
-	$(MAKE) localstack-run 'pip-compile --generate-hashes --allow-unsafe --output-file=requirements.txt requirements.in'
+# Runs the command $(2) in the sample's Docker image with the env file $(1).
+define docker_run
+docker run \
+		--rm \
+		$(DOCKER_RUN_FLAGS) \
+		-v ./:/app \
+		--env-file=$(1) \
+		--net=host \
+		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
+		bash -c "$(2)"
+endef
 
-autoformat:
-	$(MAKE) localstack-run 'black .'
+update-deps: build
+	$(call docker_run,.env.localstack,pip-compile --generate-hashes --allow-unsafe --output-file=requirements.txt requirements.in)
 
-load-tables:
-	$(MAKE) localstack-run 'python 00_load_tables.py'
+autoformat: build
+	$(call docker_run,.env.localstack,black .)
 
-feature-engineering:
-	$(MAKE) localstack-run 'python 01_feature_engineering.py'
+load-tables: build
+	$(call docker_run,.env.localstack,python 00_load_tables.py)
 
-train-model:
-	$(MAKE) localstack-run 'python 02_train_model.py'
+feature-engineering: build
+	$(call docker_run,.env.localstack,python 01_feature_engineering.py)
 
-sf-feature-engineering:
-	$(MAKE) snowflake-run 'python 01_feature_engineering.snowflake.py'
+train-model: build
+	$(call docker_run,.env.localstack,python 02_train_model.py)
 
-sf-train-model:
-	$(MAKE) snowflake-run 'python 02_train_model.snowflake.py'
+sf-feature-engineering: build
+	$(call docker_run,.env.snowflake,python 01_feature_engineering.snowflake.py)
+
+sf-train-model: build
+	$(call docker_run,.env.snowflake,python 02_train_model.snowflake.py)

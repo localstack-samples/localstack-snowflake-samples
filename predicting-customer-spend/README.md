@@ -6,7 +6,7 @@ In this sample notebook, we will explore how you can use LocalStack's Snowflake 
 
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 -   [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 -   [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 -   [Jupyter Notebook](https://jupyter.org/)
@@ -15,10 +15,10 @@ In this sample notebook, we will explore how you can use LocalStack's Snowflake 
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
+make start
 ```
+
+This runs `lstk start --type snowflake`, which starts the Snowflake emulator and waits until it is ready.
 
 ## Running the notebook
 

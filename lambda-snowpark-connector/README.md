@@ -10,7 +10,7 @@ This example demonstrates how to connect Snowpark to AWS Lambda locally using Lo
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - Python 3.10 installed locally
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
 ## Instructions
@@ -29,16 +29,10 @@ Start LocalStack:
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
-```
-
-You can also use the sample helper target:
-
-```bash
 make start-localstack
 ```
+
+This runs `lstk start --type snowflake` with `DEBUG=1`, `SF_LOG=trace` and a 180 second `LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT`, so the Snowflake queries the function runs show up in `lstk logs`.
 
 ## Create the Lambda function
 

@@ -22,6 +22,7 @@ init:      ## Initialize the Airflow environment in LocalStack MWAA
 		--source-bucket-arn arn:aws:s3:::snowflake-airflow \
 		--airflow-configuration-options agent.code=007,agent.name=bond \
 		--name my-mwaa-env \
+		--airflow-version 2.10.3 \
 		--endpoint-url http://localhost.localstack.cloud:4566
 
 deploy:     ## Deploy the DAG to the local Airflow instance

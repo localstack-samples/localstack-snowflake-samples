@@ -6,7 +6,7 @@ The code is based on the Snowflake Quickstart Guide on [Data Quality Testing wit
 
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 - [`snow` CLI](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/) with `localstack` connection profile pointing to LocalStack Snowflake
@@ -33,13 +33,14 @@ make install
 
 ## Start LocalStack
 
-To start LocalStack with custom Snowflake logging flags, use:
+To start LocalStack with Snowflake trace logging, use:
 
 ```bash
-DOCKER_FLAGS='-e SF_LOG=trace' \
-  DEBUG=1 \
-  localstack start -s snowflake -d
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+make start
 ```
+
+This runs `lstk start --type snowflake` with `SF_LOG=trace`.
 
 ## Initialize the data tables
 

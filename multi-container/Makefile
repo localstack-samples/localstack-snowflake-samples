@@ -11,7 +11,8 @@ stop:		## Stop and remove both containers
 	docker compose down
 
 logs:		## Show the logs of both containers
-	docker compose logs --tail 300
+	docker logs --tail 150 localstack-aws
+	docker logs --tail 150 localstack-snowflake
 
 test:		## Check the containers can reach each other and load data from S3 into Snowflake
 	./test.sh

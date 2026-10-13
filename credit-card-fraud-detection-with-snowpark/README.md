@@ -14,7 +14,7 @@ and finally how to deploy and use a trained model in Snowflake using Python UDF
 
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [Docker](https://docs.docker.com/get-docker/)
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/)
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/)
 - [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
 
@@ -22,10 +22,10 @@ and finally how to deploy and use a trained model in Snowflake using Python UDF
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
+make start
 ```
+
+This runs `lstk start --type snowflake`, which starts the Snowflake emulator and waits until it is ready.
 
 ## Getting Started
 
@@ -38,11 +38,19 @@ terminal context within this directory.
     make check
     ```
 
+1.  Copy the connection settings for LocalStack:
+
+    ```bash
+    cp .env.sample .env.localstack
+    ```
+
 1.  To load tables into LocalStack for Snowflake, run:
 
     ```bash
     make load-tables
     ```
+
+    `make test` runs this step and checks the three tables it creates.
 
 1.  Then, to run feature engineering via LocalStack for Snowflake, run:
 
@@ -55,6 +63,11 @@ terminal context within this directory.
     ```bash
     make train-model
     ```
+
+    Feature engineering and training on LocalStack read data checkpoints from
+    `tempdata/`. Only the Snowflake Cloud steps below write them, and they are
+    not part of the repository, so these two steps need one run against
+    Snowflake Cloud first.
 
 In order to run the sample application against Snowflake Cloud:
 
