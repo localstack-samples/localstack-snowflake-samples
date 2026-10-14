@@ -45,9 +45,10 @@ start-localstack: ## Start LocalStack for AWS and the Snowflake emulator, and wa
 	SF_LOG=trace docker compose up -d --wait
 
 logs:          ## Show the logs of both containers
-	docker compose logs --tail 300
+	docker logs --tail 300 lambda-snowpark-localstack
+	docker logs --tail 300 lambda-snowpark-snowflake
 
 stop:          ## Stop and remove both containers
-	docker compose down
+	LOCALSTACK_AUTH_TOKEN=$${LOCALSTACK_AUTH_TOKEN:-unused} docker compose down
 
 .PHONY: usage install zip create-function local-invoke test start-localstack logs stop
