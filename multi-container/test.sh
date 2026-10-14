@@ -27,7 +27,10 @@ aws --endpoint-url http://localhost:4566 s3 cp /tmp/people.csv "s3://$BUCKET/peo
 
 snow connection add --connection-name multi-container --user test --password test --account test \
   --host snowflake.localhost.localstack.cloud --port 4567 --no-interactive > /dev/null 2>&1 || true
-sql() { snow sql -c multi-container --format json -q "$1"; }
+# a new session has no current database, as in Snowflake, so create one and
+# name it on every statement (each snow sql call is a new session)
+snow sql -c multi-container -q "CREATE DATABASE IF NOT EXISTS multi_container" > /dev/null
+sql() { snow sql -c multi-container --database multi_container --schema public --format json -q "$1"; }
 
 sql "CREATE OR REPLACE TABLE people (id INT, name STRING)"
 sql "CREATE OR REPLACE STAGE people_stage URL='s3://$BUCKET' CREDENTIALS=(AWS_KEY_ID='test' AWS_SECRET_KEY='test')"
