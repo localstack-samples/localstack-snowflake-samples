@@ -1,6 +1,7 @@
 # LocalStack AWS (Glue, S3, IAM) and the Snowflake emulator run as two
 # containers on one network. The Glue job container that LocalStack starts
-# joins the same network and reaches Snowflake at http://snowflake:4566.
+# joins the same network and reaches Snowflake at http://snowflake:4566, and
+# its stage uploads at https://stages.s3.localhost.localstack.cloud:4566.
 services:
   localstack-aws:
     container_name: glue-localstack-aws
@@ -12,6 +13,11 @@ services:
       - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
       # run the Glue job containers on this network, so they resolve "snowflake"
       - MAIN_DOCKER_NETWORK=glue-snowflake
+      # the Snowflake emulator serves its stages on s3.localhost.localstack.cloud;
+      # resolve those names with Docker's DNS, which maps them to the emulator,
+      # instead of answering them with this container's own S3
+      - DNS_SERVER=127.0.0.11
+      - DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=^(stages\.)?s3\.localhost\.localstack\.cloud\.?$$
     healthcheck:
       test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4566/_localstack/health')"]
       interval: 5s
@@ -42,7 +48,12 @@ services:
     volumes:
       - "./init.sf.sql:/etc/localstack/init/ready.d/init.sf.sql:ro"
     networks:
-      - glue-snowflake
+      glue-snowflake:
+        aliases:
+          # the stage endpoint the emulator advertises, and the bucket host
+          # the Snowflake drivers build from it
+          - s3.localhost.localstack.cloud
+          - stages.s3.localhost.localstack.cloud
 
 networks:
   glue-snowflake:
