@@ -1,8 +1,6 @@
-from awsglue.transforms import *
-from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
-from py4j.java_gateway import java_import
+from pyspark.context import SparkContext
 
 SNOWFLAKE_SOURCE_NAME = "net.snowflake.spark.snowflake"
 sc = SparkContext()
@@ -10,34 +8,40 @@ glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 logger = glueContext.get_logger()
 job = Job(glueContext)
-java_import(spark._jvm, SNOWFLAKE_SOURCE_NAME)
-spark._jvm.net.snowflake.spark.snowflake.SnowflakeConnectorUtils.enablePushdownSession(spark._jvm.org.apache.spark.sql.SparkSession.builder().getOrCreate())
+
+# The Glue job container runs on the same Docker network as the Snowflake
+# emulator, so it reaches it by service name over plain HTTP.
 sfOptions = {
-    "sfURL" : "https://snowflake.localhost.localstack.cloud",
-    "sfUser" : "test",
-    "sfPassword" : "test",
-    "sfDatabase" : "test",
-    "sfSchema" : "public",
-    "sfWarehouse" : "test",
-    "application" : "AWSGlue"
+    "sfURL": "snowflake:4566",
+    "sfSSL": "off",
+    "sfAccount": "test",
+    "sfUser": "test",
+    "sfPassword": "test",
+    "sfDatabase": "test",
+    "sfSchema": "public",
+    "sfWarehouse": "test",
+    "application": "AWSGlue",
 }
 
-# Read from a Snowflake table into a Spark Data Frame
-try:
-    # Execute select query from table created using init script
-    query = "SELECT * FROM src_glue"
-    df = spark.read \
-        .format(SNOWFLAKE_SOURCE_NAME) \
-        .options(**sfOptions) \
-        .option("query", query) \
-        .load()
+# Extract: read the table created by init.sf.sql
+df = spark.read \
+    .format(SNOWFLAKE_SOURCE_NAME) \
+    .options(**sfOptions) \
+    .option("query", "SELECT * FROM src_glue") \
+    .load()
+df.show()
+logger.info(f"Read {df.count()} rows from src_glue")
 
-    logger.info("Query executed successfully")
+# Transform: keep the active rows
+active = df.filter(df["STATUS"])
 
-    # Show the results
-    df.show()
+# Load: write them to a new Snowflake table
+active.write \
+    .format(SNOWFLAKE_SOURCE_NAME) \
+    .options(**sfOptions) \
+    .option("dbtable", "tgt_glue") \
+    .mode("overwrite") \
+    .save()
+logger.info(f"Wrote {active.count()} rows to tgt_glue")
 
-    job.commit()
-except Exception as e:
-    if ("JDBC driver encountered communication error" in str(e)):
-        logger.info("JDBC_COMMUNICATION_ERROR")
+job.commit()

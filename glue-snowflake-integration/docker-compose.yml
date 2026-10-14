@@ -1,0 +1,49 @@
+# LocalStack AWS (Glue, S3, IAM) and the Snowflake emulator run as two
+# containers on one network. The Glue job container that LocalStack starts
+# joins the same network and reaches Snowflake at http://snowflake:4566.
+services:
+  localstack-aws:
+    container_name: glue-localstack-aws
+    image: localstack/localstack-pro:latest
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      - DEBUG=${DEBUG:-0}
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
+      # run the Glue job containers on this network, so they resolve "snowflake"
+      - MAIN_DOCKER_NETWORK=glue-snowflake
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - glue-snowflake
+
+  snowflake:
+    container_name: glue-snowflake
+    image: localstack/snowflake-next:latest
+    ports:
+      - "127.0.0.1:4567:4566"
+    environment:
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
+      # hostnames routed to the emulator: the service name for the Glue job,
+      # and the default name for clients on the host
+      - SF_HOSTNAMES=snowflake,snowflake.localhost.localstack.cloud,localhost
+      # init.sf.sql seeds account TEST, the account every client here uses
+      - SNOWFLAKE_INIT_ACCOUNT=TEST
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/4566 && printf 'GET /_localstack/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q available <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+    volumes:
+      - "./init.sf.sql:/etc/localstack/init/ready.d/init.sf.sql:ro"
+    networks:
+      - glue-snowflake
+
+networks:
+  glue-snowflake:
+    name: glue-snowflake

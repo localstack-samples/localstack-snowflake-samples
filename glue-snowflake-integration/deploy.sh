@@ -23,8 +23,9 @@ echo "🛠️ Job Name: $job_name"
 echo "📥 Downloading dependencies..."
 rm -rf jars && mkdir jars
 
-wget -q --show-progress "https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.20.0/snowflake-jdbc-3.20.0.jar" -P jars
-wget -q --show-progress "https://repo1.maven.org/maven2/net/snowflake/spark-snowflake_2.12/2.5.4-spark_2.4/spark-snowflake_2.12-2.5.4-spark_2.4.jar" -P jars
+# Glue 4.0 runs Spark 3.3, so use the connector build for Spark 3.3
+wget -q "https://repo1.maven.org/maven2/net/snowflake/snowflake-jdbc/3.20.0/snowflake-jdbc-3.20.0.jar" -P jars
+wget -q "https://repo1.maven.org/maven2/net/snowflake/spark-snowflake_2.12/2.16.0-spark_3.3/spark-snowflake_2.12-2.16.0-spark_3.3.jar" -P jars
 
 # Upload jars to S3
 echo "☁️ Uploading JARs to S3..."
@@ -40,7 +41,7 @@ echo "✅ Script uploaded successfully."
 echo "🚀 Starting AWS Glue job..."
 job_run_id=$(awslocal glue start-job-run --job-name $job_name --output text --query 'JobRunId')
 echo "🆔 Job Run ID: $job_run_id"
-
+echo "$job_run_id" > .last-job-run-id
 # Check Job Status
 JOB_STATUS=$(awslocal glue get-job-run --job-name $job_name --run-id $job_run_id --query 'JobRun.JobRunState' --output text)
 
@@ -60,5 +61,3 @@ else
   echo "⏹️ Job stopped!"
   exit 1
 fi
-
-echo "$job_run_id" > .last-job-run-id

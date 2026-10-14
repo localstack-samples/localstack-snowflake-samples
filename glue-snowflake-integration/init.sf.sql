@@ -1,7 +1,11 @@
--- script to create a table and populate it with the data
+-- create the database the Glue job reads from, then a table with sample data
+
+CREATE DATABASE IF NOT EXISTS test;
+USE DATABASE test;
+USE SCHEMA public;
 
 -- create a table
-CREATE TABLE src_glue (id int, name varchar, status bool);
+CREATE TABLE src_glue (id int, name varchar, status boolean);
 
 -- insert data to table
 INSERT INTO src_glue (id, name, status) VALUES
