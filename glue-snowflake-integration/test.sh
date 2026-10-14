@@ -18,7 +18,12 @@ job_logs() {
 rm -f .last-job-run-id
 if ! ./deploy.sh; then
   echo "Test failed: the Glue job did not succeed"
+  if [ -s .last-job-run-id ]; then
+    awslocal glue get-job-run --job-name glue-job --run-id "$(cat .last-job-run-id)" \
+      --query JobRun.ErrorMessage --output text || true
+  fi
   job_logs | tail -150
+  docker logs --tail 80 glue-localstack-aws 2>&1 || true
   exit 1
 fi
 
