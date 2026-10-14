@@ -4,8 +4,8 @@ usage:		## Shows usage for this Makefile
 install:    ## Nothing to install on the host, the test runs the app in a python:3.8 container
 	@echo "Nothing to install"
 
-start-localstack: ## Start LocalStack for Snowflake
-	lstk start --type snowflake --non-interactive --timeout 3m
+start-localstack: ## Start the LocalStack Snowflake Next emulator
+	lstk start --type snowflake --image localstack/snowflake-next:latest --non-interactive --timeout 3m
 
 logs:       ## Show the LocalStack logs
 	lstk logs --tail 300

@@ -26,7 +26,7 @@ To run the app, following steps are required:
 
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
-- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+- [LocalStack Snowflake Next emulator](https://hub.docker.com/r/localstack/snowflake-next) (`localstack/snowflake-next`), which needs an auth token with the Snowflake preview entitlement
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 - [Streamlit CLI](https://github.com/streamlit/streamlit)
 
@@ -78,7 +78,14 @@ export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 make start-localstack
 ```
 
-This runs `lstk start --type snowflake`, which starts the Snowflake emulator and waits until it is ready.
+This runs `lstk start --type snowflake --image localstack/snowflake-next:latest` (`lstk` 1.3.0 or later), which starts the Snowflake Next emulator and waits until it is ready. Without `lstk`, start the image with Docker:
+
+```bash
+docker run --rm -it -p 127.0.0.1:4566:4566 -p 127.0.0.1:443:443 \
+    -e LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?} localstack/snowflake-next
+```
+
+The app connects on port 443, the connector default, so publish that port.
 
 ## Data setup in LocalStack Snowflake
 
@@ -98,10 +105,6 @@ After performing the setup and switching to the virtual environment, you can run
 ## Testing
 
 `make test` loads the demo data, starts the app in a `python:3.8-slim-bullseye` container and runs `tests/smoke_test.py`, which builds the three filters the way `main.py` does, applies them and checks the result against the same filter written in SQL.
-
-## Known issue
-
-The result preview calls `.sample(n=5)`, which runs `SELECT ... FROM (<subquery>) SAMPLE (5 ROWS)`. The Snowflake emulator currently rejects `SAMPLE` on a subquery, so the preview shows an error in the app. The smoke test reports this and checks the preview data with `LIMIT` instead.
 
 ## License
 

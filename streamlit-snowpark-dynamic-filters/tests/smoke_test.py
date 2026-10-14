@@ -76,15 +76,8 @@ labels = mk_labels(f.human_name for f in filters)
 check(len(labels) == len(table_sequence) + 1, "the Sankey chart has a label per step")
 
 # The app previews the result with .sample(n=5), which runs
-# SELECT ... FROM (<subquery>) SAMPLE (5 ROWS). The Snowflake emulator rejects
-# SAMPLE on a subquery, so report that and check the preview data with LIMIT.
-try:
-    preview = table_sequence[-1].sample(n=5).to_pandas()
-except Exception as e:
-    if "unexpected 'SELECT'" not in str(e):
-        raise
-    print("KNOWN EMULATOR ISSUE: SAMPLE on a subquery fails, checking the preview with LIMIT instead")
-    preview = table_sequence[-1].limit(5).to_pandas()
+# SELECT ... FROM (<subquery>) SAMPLE (5 ROWS).
+preview = table_sequence[-1].sample(n=5).to_pandas()
 check(len(preview) == 5, "the result preview returns 5 rows")
 
 statements = [t.queries["queries"][0] for t in table_sequence]
