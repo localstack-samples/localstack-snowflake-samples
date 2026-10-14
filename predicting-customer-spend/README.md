@@ -6,8 +6,8 @@ In this sample notebook, we will explore how you can use LocalStack's Snowflake 
 
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
--   [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) 1.3.0 or later, with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+-   The [Snowflake Next emulator](https://hub.docker.com/r/localstack/snowflake-next) (`localstack/snowflake-next`). Your license needs the Snowflake preview entitlement.
 -   [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 -   [Jupyter Notebook](https://jupyter.org/)
 
@@ -15,20 +15,37 @@ In this sample notebook, we will explore how you can use LocalStack's Snowflake 
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
+make start
+```
+
+This runs `lstk start --type snowflake --image localstack/snowflake-next:latest`, which pulls the Snowflake Next emulator, starts it and waits until it is ready. Run `make stop` to stop it.
+
+Without `lstk`, start it with Docker:
+
+```bash
+docker run --rm -it -p 127.0.0.1:4566:4566 -p 127.0.0.1:443:443 \
+  -e LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?} localstack/snowflake-next:latest
 ```
 
 ## Running the notebook
 
-Start the [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/) using your preferred method. Ensure that you have access to LocalStack's Snowflake emulator. Start a Jupyter Notebook server and open the notebook in your browser.
+Start a Jupyter Notebook server and open the notebook in your browser.
 
 ```bash
 jupyter notebook
 ```
 
-Open the `linear-regression-model.ipynb` notebook and run the cells to see the results. Follow the instructions in the notebook to install the required packages and set up the Snowflake emulator.
+Open the `linear-regression-model.ipynb` notebook and run the cells to see the results. Follow the instructions in the notebook to install the required packages and connect to the Snowflake emulator.
+
+## Testing
+
+```bash
+make install
+make start
+make test
+```
+
+`make test` runs every cell of the notebook with `nbconvert` and checks the results in Snowflake.
 
 ## License
 

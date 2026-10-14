@@ -10,27 +10,19 @@ removing mentions of that. Wait to migrate to Docker image
 quay.io/jupyter/datascience-notebook.
 """
 
-########## BEGIN LOCALSTACK WORKAROUND ##########
-
-# Run `00_load_tables.dummy.py` before running this file, in order to set up
-# prior Snowflake emulator state from scratch.
-import _dummy_load_tables
-
-########## END LOCALSTACK WORKAROUND ##########
-
 import logging
 import os
 
 from dotenv import load_dotenv
-import pandas
 import snowflake.snowpark as snowpark  # type: ignore
 import snowflake.snowpark.functions as functions  # type: ignore
-import snowflake.snowpark.types as types  # type: ignore
 from snowflake.snowpark import Session, Window  # type: ignore
 
-# NOTE: Change this to run against Snowflake or LocalStack.
-# ENV_FILE = ".env.snowflake"
-ENV_FILE = ".env.localstack"
+from utils import connection_parameters
+
+# `.env.localstack` connects to the LocalStack Snowflake emulator, and
+# `.env.snowflake` to Snowflake Cloud. The Makefile sets ENV_FILE.
+ENV_FILE = os.getenv("ENV_FILE", ".env.localstack")
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv(ENV_FILE)
@@ -40,26 +32,7 @@ load_dotenv(ENV_FILE)
 
 logging.info(f"Snowpark for Python version {snowpark.__version__}")
 
-# NOTE: Change this to run against Snowflake or LocalStack.
-# snowflake_connection_parameters = {
-#     "account": os.getenv("ACCOUNTNAME"),
-#     "user": os.getenv("USERNAME"),
-#     "password": os.getenv("PASSWORD"),
-#     "role": os.getenv("ROLENAME"),
-#     "database": os.getenv("DBNAME"),
-#     "schema": os.getenv("SCHEMANAME"),
-#     "warehouse": os.getenv("WAREHOUSENAME"),
-# }
-# session = Session.builder.configs(snowflake_connection_parameters).create()
-
-localstack_connection_parameters = {
-    "account": os.getenv("ACCOUNTNAME"),
-    "user": os.getenv("USERNAME"),
-    "password": os.getenv("PASSWORD"),
-    "database": os.getenv("DBNAME"),
-    "host": os.getenv("HOST"),
-}
-session = Session.builder.configs(localstack_connection_parameters).create()
+session = Session.builder.configs(connection_parameters()).create()
 
 # Define a DataFrame
 #
@@ -73,6 +46,7 @@ session = Session.builder.configs(localstack_connection_parameters).create()
 # to use the table are executed in Snowflake.
 
 df_cust_trx_fraud = session.table("CUSTOMER_TRANSACTIONS_FRAUD")
+
 logging.info(df_cust_trx_fraud.show())
 
 # Data Understanding
@@ -86,117 +60,30 @@ logging.info(df_cust_trx_fraud.describe().show())
 
 # We can see that we have about 6 months  of transactions and around 9k
 # transactions/day.
+#
+# Let's count the number of fraudulent and none fraudulent transactions, by
+# using the **call_function** function we can also use the use
+# **RATIO_TO_REPORT** function (that currently is not exposed in the Snowpark
+# API) to also get percentages
 
-########## BEGIN LOCALSTACK WORKAROUND ##########
-
-# NOTE: Stop execution before this line, using `import ipdb; ipdb.set_trace()`,
-# and run the commented-out SQL solution manually, before continuing execution.
-
-# # Let's count the number of fraudulent and none fraudulent transactions, by
-# # using the **call_function** function we can also use the use
-# # **RATIO_TO_REPORT** function (that currently is not exposed in the Snowpark
-# # API) to also get percentages
-# logging.info(
-#     df_cust_trx_fraud.group_by(functions.col("TX_FRAUD"))
-#     .agg(functions.count(functions.col("TRANSACTION_ID")).as_("NB_TX_DAY"))
-#     .select(
-#         functions.col("TX_FRAUD"),
-#         functions.col("NB_TX_DAY"),
-#         (
-#             functions.call_function(
-#                 "RATIO_TO_REPORT", functions.col("NB_TX_DAY")
-#             ).over()
-#             * 100
-#         ).as_("percentage"),
-#     )
-#     .show()
-# )
-#
-# LocalStack Snowflake emulator SQL:
-#
-# ```sql
-# SELECT
-#   "TX_FRAUD",
-#   "NB_TX_DAY",
-#   (
-#     CAST(
-#       ROUND(
-#         CAST("NB_TX_DAY" AS DECIMAL) / sum("NB_TX_DAY") OVER (),
-#         6
-#       ) AS TEXT
-#     ) * CAST(100 AS INT)
-#   ) AS "PERCENTAGE"
-# FROM
-#   (
-#     SELECT
-#       "TX_FRAUD",
-#       COUNT("TRANSACTION_ID") AS "NB_TX_DAY"
-#     FROM
-#       (
-#         SELECT
-#           *
-#         FROM
-#           "CUSTOMER_TRANSACTIONS_FRAUD"
-#       ) AS _tmpc2e410ae
-#     GROUP BY
-#       "TX_FRAUD"
-#   ) AS _tm p436ba9cf
-# LIMIT
-#   10
-# ```
-#
-# Snowflake SQL:
-#
-# ```sql
-# SELECT
-#   "TX_FRAUD",
-#   "NB_TX_DAY",
-#   (
-#     RATIO_TO_REPORT("NB_TX_DAY") OVER () * 100 :: INT
-#   ) AS "PERCENTAGE"
-# FROM
-#   (
-#     SELECT
-#       "TX_FRAUD",
-#       count("TRANSACTION_ID") AS "NB_TX_DAY"
-#     FROM
-#       (
-#         SELECT
-#           *
-#         FROM
-#           CUSTOMER_TRANSACTIONS_FRAUD
-#       )
-#     GROUP BY
-#       "TX_FRAUD"
-#   )
-# ```
-#
-result1_as_pd_df = pandas.read_parquet(
-    "tempdata/01_feature_engineering.result1.parquet"
+result1 = (
+    df_cust_trx_fraud.group_by(functions.col("TX_FRAUD"))
+    .agg(functions.count(functions.col("TRANSACTION_ID")).as_("NB_TX_DAY"))
+    .select(
+        functions.col("TX_FRAUD"),
+        functions.col("NB_TX_DAY"),
+        (
+            functions.call_function(
+                "RATIO_TO_REPORT", functions.col("NB_TX_DAY")
+            ).over()
+            * 100
+        ).as_("percentage"),
+    )
 )
-# TODO: Implement Snowpark dataframe using schema=result1_schema. This currently
-# does not work because using SnowPark types makes a database call to run
-# `CREATE SCOPED TEMP TABLE`, while Pandas columns do not.
-#
-# result1_schema = types.StructType(
-#     [
-#         types.StructField("TX_FRAUD", types.LongType(), nullable=True),
-#         types.StructField("NB_TX_DAY", types.LongType(), nullable=False),
-#         types.StructField("PERCENTAGE", types.DecimalType(38, 6), nullable=True),
-#     ]
-# )
-# result1 = session.create_dataframe(
-#     result1_as_pd_df.values.tolist(), schema=result1_schema
-# )
-result1 = session.create_dataframe(
-    result1_as_pd_df.values.tolist(), schema=result1_as_pd_df.columns.tolist()
-)
+
 logging.info(result1.show())
 
-########## END LOCALSTACK WORKAROUND ##########
-
-
-pd_day_by_card = (
+df_day_by_card = (
     df_cust_trx_fraud.filter(functions.col("TX_FRAUD") == 1)
     .group_by(functions.to_date(functions.col("TX_DATETIME")))
     .agg(
@@ -208,8 +95,9 @@ pd_day_by_card = (
         ]
     )
     .sort(functions.col("TO_DATE(TX_DATETIME)"))
-    .to_pandas()
 )
+
+pd_day_by_card = df_day_by_card.to_pandas()
 
 logging.info(pd_day_by_card)
 
@@ -252,230 +140,53 @@ def gen_time_feat(df):
     return df_date_time_feat
 
 
-########## BEGIN LOCALSTACK WORKAROUND ##########
+df_date_time_feat = gen_time_feat(df_cust_trx_fraud)
 
-# NOTE: Stop execution before this line, using `import ipdb; ipdb.set_trace()`,
-# and run the commented-out SQL solution manually, before continuing execution.
+result2 = df_date_time_feat.sort(functions.col("TRANSACTION_ID"))
 
-# df_date_time_feat = gen_time_feat(df_cust_trx_fraud)
-#
-# LocalStack Snowflake emulator SQL:
-#
-# ```sql
-# SELECT
-#   "TRANSACTION_ID",
-#   "TX_DATETIME",
-#   "CUSTOMER_ID",
-#   "TERMINAL_ID",
-#   "TX_AMOUNT",
-#   "TX_TIME_SECONDS",
-#   "TX_TIME_DAYS",
-#   "TX_FRAUD",
-#   "TX_FRAUD_SCENARIO",
-#   CASE WHEN (
-#     (
-#       "DAYOFWEEK"("TX_DATETIME") = CAST(6 AS INT)
-#     )
-#     OR (
-#       "DAYOFWEEK"("TX_DATETIME") = CAST(0 AS INT)
-#     )
-#   ) THEN 1 ELSE 0 END AS "TX_DURING_WEEKEND",
-#   CASE WHEN (
-#     (
-#       "HOUR"("TX_DATETIME") < CAST(6 AS INT)
-#     )
-#     OR (
-#       "HOUR"("TX_DATETIME") > CAST(20 AS INT)
-#     )
-#   ) THEN 1 ELSE 0 END AS "TX_DURING_NIGHT"
-# FROM
-#   "CUSTOMER_TRANSACTIONS_FRAUD"
-# LIMIT
-#   10
-# ```
-#
-# Snowflake SQL
-#
-# ```sql
-# SELECT
-#   "TRANSACTION_ID",
-#   "TX_DATETIME",
-#   "CUSTOMER_ID",
-#   "TERMINAL_ID",
-#   "TX_AMOUNT",
-#   "TX_TIME_SECONDS",
-#   "TX_TIME_DAYS",
-#   "TX_FRAUD",
-#   "TX_FRAUD_SCENARIO",
-#   iff(
-#     (
-#       (
-#         dayofweek("TX_DATETIME") = 6 :: INT
-#       )
-#       OR (
-#         dayofweek("TX_DATETIME") = 0 :: INT
-#       )
-#     ),
-#     1,
-#     0
-#   ) AS "TX_DURING_WEEKEND",
-#   iff(
-#     (
-#       (
-#         hour("TX_DATETIME") < 6 :: INT
-#       )
-#       OR (
-#         hour("TX_DATETIME") > 20 :: INT
-#       )
-#     ),
-#     1,
-#     0
-#   ) AS "TX_DURING_NIGHT"
-# FROM
-#   CUSTOMER_TRANSACTIONS_FRAUD
-# ```
-#
+logging.info(result2.show())
 
-########## WHERE I STOPPED FILING BUGS ##########
-########## WHERE I STOPPED FILING BUGS ##########
-########## WHERE I STOPPED FILING BUGS ##########
-df_date_time_feat_as_pd_df = pandas.read_parquet(
-    "tempdata/01_feature_engineering.df_date_time_feat.parquet"
-)
-df_date_time_feat_schema = types.StructType(
-    [
-        types.StructField("TRANSACTION_ID", types.LongType(), nullable=True),
-        types.StructField(
-            "TX_DATETIME", types.TimestampType(tz=types.ntz), nullable=True
-        ),
-        types.StructField("CUSTOMER_ID", types.LongType(), nullable=True),
-        types.StructField("TERMINAL_ID", types.LongType(), nullable=True),
-        types.StructField("TX_AMOUNT", types.DoubleType(), nullable=True),
-        types.StructField("TX_TIME_SECONDS", types.LongType(), nullable=True),
-        types.StructField("TX_TIME_DAYS", types.LongType(), nullable=True),
-        types.StructField("TX_FRAUD", types.LongType(), nullable=True),
-        types.StructField("TX_FRAUD_SCENARIO", types.LongType(), nullable=True),
-        types.StructField("TX_DURING_WEEKEND", types.LongType(), nullable=False),
-        types.StructField("TX_DURING_NIGHT", types.LongType(), nullable=False),
-    ]
+# Is there differences between the number of fraud cases during
+# weekdays/weekdays and day/Night?
+
+window = Window.partition_by(
+    functions.col("TX_DURING_WEEKEND"), functions.col("TX_DURING_NIGHT")
 )
 
-df_date_time_feat = session.create_dataframe(
-    df_date_time_feat_as_pd_df.values.tolist(),
-    schema=df_date_time_feat_as_pd_df.columns.to_list(),
+result3 = (
+    df_date_time_feat.group_by(
+        functions.col("TX_DURING_WEEKEND"),
+        functions.col("TX_DURING_NIGHT"),
+        functions.col("TX_FRAUD"),
+    )
+    .count()
+    .sort(
+        functions.col("TX_DURING_WEEKEND"),
+        functions.col("TX_DURING_NIGHT"),
+        functions.col("TX_FRAUD"),
+    )
+    .select(
+        functions.col("TX_DURING_WEEKEND"),
+        functions.col("TX_DURING_NIGHT"),
+        functions.col("TX_FRAUD"),
+        (
+            functions.call_function("RATIO_TO_REPORT", functions.col("COUNT")).over(
+                window
+            )
+            * 100
+        ).as_("percentage"),
+    )
+    .sort(
+        functions.col("TX_DURING_WEEKEND"),
+        functions.col("TX_DURING_NIGHT"),
+        functions.col("TX_FRAUD"),
+    )
 )
 
-########## END LOCALSTACK WORKAROUND ##########
+logging.info(result3.show())
 
-logging.debug(df_date_time_feat.sort(functions.col("TRANSACTION_ID")).show())
-
-########## BEGIN LOCALSTACK WORKAROUND ##########
-
-# NOTE: Stop execution before this line, using `import ipdb; ipdb.set_trace()`,
-# and run the commented-out SQL solution manually, before continuing execution.
-
-# # Is there differences between the number of fraud cases during
-# # weekdays/weekdays and day/Night?
-#
-# window = Window.partition_by(
-#     functions.col("TX_DURING_WEEKEND"), functions.col("TX_DURING_NIGHT")
-# )
-# result_one = (
-#     df_date_time_feat.group_by(
-#         functions.col("TX_DURING_WEEKEND"),
-#         functions.col("TX_DURING_NIGHT"),
-#         functions.col("TX_FRAUD"),
-#     )
-#     .count()
-#     .sort(
-#         functions.col("TX_DURING_WEEKEND"),
-#         functions.col("TX_DURING_NIGHT"),
-#         functions.col("TX_FRAUD"),
-#     )
-#     .select(
-#         functions.col("TX_DURING_WEEKEND"),
-#         functions.col("TX_DURING_NIGHT"),
-#         functions.col("TX_FRAUD"),
-#         (
-#             functions.call_function("RATIO_TO_REPORT", functions.col("COUNT")).over(
-#                 window
-#             )
-#             * 100
-#         ).as_("percentage"),
-#     )
-#     .sort(
-#         functions.col("TX_DURING_WEEKEND"),
-#         functions.col("TX_DURING_NIGHT"),
-#         functions.col("TX_FRAUD"),
-#     )
-# )
-# logging.info(result_one.show())
-#
-# # We can see that basicly the number of fradulent transactions are the same
-# # during the days
-
-
-# Currently, the commented-out line of Python runs the following SQL against
-# PostgreSQL:
-#
-# ```sql
-# SELECT
-#   "TX_DURING_WEEKEND",
-#   "TX_DURING_NIGHT",
-#   "TX_FRAUD",
-#   COUNT(1) AS "COUNT"
-# FROM
-#   (
-#     SELECT
-#       "TRANSACTION_ID",
-#       "TX_DATETIME",
-#       "CUSTOMER_ID",
-#       "TERMINAL_ID",
-#       "TX_AMOUNT",
-#       "TX_TIME_SECONDS",
-#       "TX_TIME_DAYS",
-#       "TX_FRAUD",
-#       "TX_FRAUD_SCENARIO",
-#       CASE WHEN (
-#         (
-#           "DAYOFWEEK"("TX_DATETIME") = CAST(6 AS INT)
-#         )
-#         OR (
-#           "DAYOFWEEK"("TX_DATETIME") = CAST(0 AS INT)
-#         )
-#       ) THEN 1 ELSE 0 END AS "TX_DURING_WEEKEND",
-#       CASE WHEN (
-#         (
-#           "HOUR"("TX_DATETIME") < CAST(6 AS INT)
-#         )
-#         OR (
-#           "HOUR"("TX_DATETIME") > CAST(20 AS INT)
-#         )
-#       ) THEN 1 ELSE 0 END AS "TX_DURING_NIGHT"
-#     FROM
-#       (
-#         SELECT
-#           *
-#         FROM
-#           "CUSTOMER_TRANSACTIONS_FRAUD"
-#       ) AS _tmpe7b1e2f3
-#   ) AS _tmp62e9da4e
-# GROUP BY
-#   "TX_DURING_WEEKEND",
-#   "TX_DURING_NIGHT",
-#   "TX_FRAUD"
-# ```
-#
-# TODO: Implement workaround
-
-########## END LOCALSTACK WORKAROUND ##########
-
-
-########## BEGIN LOCALSTACK WORKAROUND ##########
-
-# NOTE: Stop execution before this line, using `import ipdb; ipdb.set_trace()`,
-# and run the commented-out Python solution manually, before continuing
-# execution.
+# We can see that basicly the number of fradulent transactions are the same
+# during the days
 
 # Customer spending behaviour transformations
 #
@@ -500,186 +211,33 @@ logging.debug(df_date_time_feat.sort(functions.col("TRANSACTION_ID")).show())
 # **CUSTOMER** table to create a new dataframe that has now one row for each
 # date between the minimum transaction date and maximum transaction date and
 # customer, as illustrated in the image below.
-#
-# date_info = df_cust_trx_fraud.select(
-#     functions.min(functions.col("TX_DATETIME")).as_("END_DATE"),
-#     functions.datediff(
-#         "DAY", functions.col("END_DATE"), functions.max(functions.col("TX_DATETIME"))
-#     ).as_("NO_DAYS"),
-# )
 
-# Currently, the commented-out line of Python above runs the following
-# equivalent SQL against PostgreSQL:
-#
-# ```sql
-# SELECT
-#   MIN("TX_DATETIME") AS "END_DATE",
-#   CAST(
-#     EXTRACT(
-#       epoch
-#       FROM
-#         CAST(
-#           MAX("TX_DATETIME") AS TIMESTAMP
-#         ) - CAST("END_DATE" AS TIMESTAMP)
-#     ) / 86400 AS BIGINT
-#   ) AS "NO_DAYS"
-# FROM
-#   "CUSTOMER_TRANSACTIONS_FRAUD"
-# ```
-#
-# LocalStack Engineering: Assuming that this `SELECT` statement is silently
-# wrapped by a transaction, it appears that the Snowflake SQL parser parses from
-# left-to-right **within a single transaction** instead of parsing on a
-# per-transaction basis, which is pretty surprising. This breaks the aliasing
-# logic when transpiling for our Snowflake emulator, which assumes that aliases
-# created in one transaction / CTE will only be made available in the next
-# transaction / CTE. In order to resolve this issue, we would need to replace
-# aliases with their original statements, but only within the context of that
-# transaction / CTE, since afterwards the underlying data could have changed
-# (e.g. in the example above, if "TX_DATETIME" was aliased to another column
-# within that transaction, MIN("TX_DATETIME") may return a different result).
-# This is a non-trivial bug, and therefore we recommend manually replacing
-# aliases in the same transaction with the original statement (e.g.
-# `functions.col("END_DATE")` with
-# `functions.min(functions.col("TX_DATETIME"))`), to get the equivalent SQL:
-#
-# ```sql
-# SELECT
-#   MIN("TX_DATETIME") AS "END_DATE",
-#   CAST(
-#     EXTRACT(
-#       epoch
-#       FROM
-#         CAST(
-#           MAX("TX_DATETIME") AS TIMESTAMP
-#         ) - CAST(
-#           MIN("TX_DATETIME") AS TIMESTAMP
-#         )
-#     ) / 86400 AS BIGINT
-#   ) AS "NO_DAYS"
-# FROM
-#   "CUSTOMER_TRANSACTIONS_FRAUD"
-# ```
-#
-# Yet to be answered: if "TX_DATETIME" is aliased within the same transaction,
-# then which column would `MIN("TX_DATETIME")` reference, the first or the
-# second? E.g.
-#
-# ```sql
-# SELECT
-#   "TX_DATETIME" AS "TX_DATETIME_2",
-#   "_TX_DATETIME" AS "TX_DATETIME",
-#   MIN("TX_DATETIME") AS "END_DATE"
-# FROM
-#   "CUSTOMER_TRANSACTIONS_FRAUD"
-# ```
-#
-# Q: If it is executed from left-to-right, would this imply that this SQL...is
-# actually procedural, instead of declarative, like SQL is supposed to be...?
-#
-date_info = df_cust_trx_fraud.select(
+result4 = df_cust_trx_fraud.select(
     functions.min(functions.col("TX_DATETIME")).as_("END_DATE"),
     functions.datediff(
-        "DAY",
-        functions.min(functions.col("TX_DATETIME")),
-        functions.max(functions.col("TX_DATETIME")),
+        "DAY", functions.col("END_DATE"), functions.max(functions.col("TX_DATETIME"))
     ).as_("NO_DAYS"),
 )
 
-########## END LOCALSTACK WORKAROUND ##########
+date_info = result4.to_pandas()
 
-date_info_as_pandas = date_info.to_pandas()
 
-days = int(date_info_as_pandas["NO_DAYS"].values[0])
-start_date = str(date_info_as_pandas["END_DATE"].values[0].astype("datetime64[D]"))
+days = int(date_info["NO_DAYS"].values[0])
+start_date = str(date_info["END_DATE"].values[0].astype("datetime64[D]"))
 
-########## BEGIN LOCALSTACK WORKAROUND ##########
-
-# NOTE: Stop execution before this line, using `import ipdb; ipdb.set_trace()`,
-# and run the commented-out SQL solution manually, before continuing execution.
-
-# # Create a dataframe with one row for each date between the min and max
-# # transaction date
-# df_days = session.range(days).with_column(
-#     "TX_DATE",
-#     functions.to_date(
-#         functions.dateadd("DAY", functions.seq4(), functions.lit(start_date))
-#     ),
-# )
-
-# Currently, the commented-out line of Python runs the following SQL against
-# PostgreSQL:
-#
-# ```sql
-# SELECT
-#   (
-#     ROW_NUMBER() OVER (
-#       ORDER BY
-#         "SEQ8"()
-#     ) -1
-#   ) * (1) + (0) AS "ID"
-# FROM
-#   (
-#     "GENERATOR"("ROWCOUNT" => 153)
-#   ) AS _tmp4e72a70e
-# ```
-#
-# This is equivalent to `session.range(days)` only, since `.with_column()` is
-# only evaluated afterwards. To replace:
-#
-# ```python
-# session.range(days)
-# ```
-#
-# Use:
-#
-# ```python
-# session_as_days = session.create_dataframe([
-#     snowpark.Row(ID = idx)
-#     for idx
-#     in range(0, days - 1)
-# ])
-# ```
-#
-# TODO: Add ticket for the rest of the Python method reproduction
-#
-# As a temporary workaround, read the Parquet file
-# `tempdata/01_feature_engineering.df_days.parquet` into a Pandas dataframe, and
-# then create a Snowpark dataframe as `df_days` from that.
-df_days_as_pd_df = pandas.read_parquet(
-    "tempdata/01_feature_engineering.df_days.parquet"
+# Create a dataframe with one row for each date between the min and max
+# transaction date
+df_days = session.range(days).with_column(
+    "TX_DATE",
+    functions.to_date(
+        functions.dateadd("DAY", functions.seq4(), functions.lit(start_date))
+    ),
 )
-df_days = session.create_dataframe(
-    df_days_as_pd_df.values.tolist(), schema=df_days_as_pd_df.columns.to_list()
-)
-
-########## END LOCALSTACK WORKAROUND ##########
 
 # Since we aggregate by customer and day and not all customers have transactions
 # for all dates we cross join our date dataframe with our customer table so each
 # customer witll have one row for each date
 df_customers = session.table("CUSTOMERS").select("CUSTOMER_ID")
-
-
-########## WHERE I LEFT OFF ##########
-########## WHERE I LEFT OFF ##########
-########## WHERE I LEFT OFF ##########
-
-
-# TODO: This line here is broken - checkout `main`, grab the result as a
-# DataFrame and export to Parquet, then switch back to this branch, and then
-# read `df_cust_day` from a dataframe.
-#
-# Query as run by SnowFlake:
-#
-# TODO: Add
-#
-# Query as run by PostgreSQL:
-#
-# ```sql
-# SELECT "ID" AS "ID", "TX_DATE" AS "TX_DATE" FROM (SELECT "ID", TO_DATE(CAST("TX_DATE" AS TEXT), 'YYYY/MM/DD') AS "TX_DATE" FROM (SELECT "_COL1" AS "ID", "_COL2" AS "TX_DATE" FROM (VALUES (CAST(0 AS BIGINT), CAST('a' AS TEXT))) AS _tmp90d4a10d("_COL1", "_COL2")) AS _tmp2b46038c) AS _tmp
-# ```
-#
 df_cust_day = df_days.join(df_customers)
 
 logging.debug(df_cust_day.show())
@@ -940,6 +498,7 @@ df_term_feat_day = df_term_trx_by_day.select(
     .over(win_30d_term)
     .as_("NB_FRAUD_DELAY_WINDOW_30"),
 )
+
 
 df_term_behaviur_feat = (
     df_cust_behaviur_feat.join(

@@ -20,6 +20,7 @@ const factory = {
               type: 'pkcs8'
             }),
             database: config.snowflake_database,
+            schema: config.snowflake_schema,
             warehouse: config.snowflake_warehouse,
             accessUrl: config.snowflake_url,
             host: config.snowflake_host,

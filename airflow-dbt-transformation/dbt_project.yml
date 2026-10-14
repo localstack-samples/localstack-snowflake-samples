@@ -1,6 +1,6 @@
 name: test_dbt
 models:
-  my_project:
+  test_dbt:
     # Applies to all files under models/example/
     transform:
       schema: transform

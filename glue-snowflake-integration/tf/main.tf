@@ -57,8 +57,9 @@ resource "aws_s3_bucket" "glue_assets" {
 resource "aws_glue_job" "glue_job" {
   name         = "glue-job"
   role_arn     = aws_iam_role.glue_execution_role.arn
-  glue_version = "4.0"
-  worker_type  = "G.1X"
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
   command {
     name            = "glueetl"
     python_version  = "3"
@@ -67,7 +68,7 @@ resource "aws_glue_job" "glue_job" {
   default_arguments = {
     "--class"                            = "GlueApp"
     "--enable-continuous-cloudwatch-log" = "true"
-    "--extra-jars"                       = "s3://${aws_s3_bucket.glue_assets.bucket}/jars/snowflake-jdbc-3.20.0.jar,s3://${aws_s3_bucket.glue_assets.bucket}/jars/spark-snowflake_2.12-2.5.4-spark_2.4.jar"
+    "--extra-jars"                       = "s3://${aws_s3_bucket.glue_assets.bucket}/jars/snowflake-jdbc-3.20.0.jar,s3://${aws_s3_bucket.glue_assets.bucket}/jars/spark-snowflake_2.12-2.16.0-spark_3.3.jar"
   }
 }
 

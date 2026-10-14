@@ -21,7 +21,7 @@ SELECT
 abs(random() % 25), -- years_tenure, from 1998
 abs(random() % 8), -- weekly workout count, average
 --abs(random() % 8), -- is current customer
-(random()::bit(32)::int % 3)::bool, -- is current customer
+abs(random()) % 3 != 0, -- is current customer, about two thirds true
 lower(randstr(5, random())) || '@example.org'
 FROM
 --    table(generator(rowCount => 10000000));

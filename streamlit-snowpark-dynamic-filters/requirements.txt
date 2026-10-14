@@ -67,7 +67,7 @@ psutil==5.9.1; python_version >= "3.7" and python_full_version < "3.0.0" or pyth
 ptyprocess==0.7.0; sys_platform != "win32" and python_version >= "3.8" and os_name != "nt"
 pure-eval==0.2.2; python_version >= "3.8"
 py==1.11.0; python_version >= "3.7" and python_full_version < "3.0.0" and implementation_name == "pypy" or implementation_name == "pypy" and python_version >= "3.7" and python_full_version >= "3.5.0"
-pyarrow==6.0.1; python_version >= "3.6"
+pyarrow==8.0.0; python_version >= "3.7"
 pycparser==2.21; python_version >= "3.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" and python_version >= "3.7"
 pycryptodomex==3.15.0; python_full_version >= "3.8.0" and python_version >= "3.7" and python_full_version < "3.9.0"
 pydeck==0.7.1; python_version >= "3.7"

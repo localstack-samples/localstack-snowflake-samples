@@ -5,8 +5,9 @@
    # Checks that column contains no NULL values
      - missing_count(name) = 0:
          name: No NULL values
-   # Checks for columns removed or added, or changed type or index
+   # Checks that the expected columns exist. Checks for schema changes over
+   # time ("when schema changes") need a Soda Cloud account to store history.
      - schema:
-         warn:
-           when schema changes: any
-         name: No changes to schema
+         fail:
+           when required column missing: [ID, NAME]
+         name: Required columns present

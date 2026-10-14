@@ -25,8 +25,8 @@ To run the app, following steps are required:
 ## Prerequisites
 
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
-- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [LocalStack Snowflake Next emulator](https://hub.docker.com/r/localstack/snowflake-next) (`localstack/snowflake-next`), which needs an auth token with the Snowflake preview entitlement
 - [Snowpark for Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)
 - [Streamlit CLI](https://github.com/streamlit/streamlit)
 
@@ -75,10 +75,17 @@ host = "snowflake.localhost.localstack.cloud"
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
-localstack auth set-token $LOCALSTACK_AUTH_TOKEN
-localstack start -s snowflake -d
-localstack wait -t 30
+make start-localstack
 ```
+
+This runs `lstk start --type snowflake --image localstack/snowflake-next:latest` (`lstk` 1.3.0 or later), which starts the Snowflake Next emulator and waits until it is ready. Without `lstk`, start the image with Docker:
+
+```bash
+docker run --rm -it -p 127.0.0.1:4566:4566 -p 127.0.0.1:443:443 \
+    -e LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?} localstack/snowflake-next
+```
+
+The app connects on port 443, the connector default, so publish that port.
 
 ## Data setup in LocalStack Snowflake
 
@@ -94,6 +101,10 @@ snow sql -c localstack -f .assets/setup.sql
 After performing the setup and switching to the virtual environment, you can run the application using:
 
 `streamlit run main.py`
+
+## Testing
+
+`make test` loads the demo data, starts the app in a `python:3.8-slim-bullseye` container and runs `tests/smoke_test.py`, which builds the three filters the way `main.py` does, applies them and checks the result against the same filter written in SQL.
 
 ## License
 

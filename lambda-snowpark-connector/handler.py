@@ -1,6 +1,11 @@
+import os
+
 import snowflake.connector as sf
 
 def lambda_handler(event, context):
+    # The host, port and protocol come from the function's environment, so the
+    # same code reaches the Snowflake emulator from inside the Lambda container
+    # (by its service name, over http) and from the host (the defaults)
     snowflake_params = {
         'user': 'test',
         'password': 'test',
@@ -8,7 +13,9 @@ def lambda_handler(event, context):
         'warehouse': 'test',
         'database': 'test',
         'schema': 'TEST_SCHEMA',
-        'host': 'snowflake.localhost.localstack.cloud'
+        'host': os.environ.get('SNOWFLAKE_HOST', 'snowflake.localhost.localstack.cloud'),
+        'port': int(os.environ.get('SNOWFLAKE_PORT', '443')),
+        'protocol': os.environ.get('SNOWFLAKE_PROTOCOL', 'https'),
     }
 
     # Establish a connection
