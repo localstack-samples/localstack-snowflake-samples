@@ -1,4 +1,7 @@
 FUNCTION_NAME = localstack-snowflake-lambda-example
+# where the function reaches the Snowflake emulator: its service name on the
+# lambda-snowpark Docker network, over plain http
+SNOWFLAKE_ENV = Variables={SNOWFLAKE_HOST=snowflake,SNOWFLAKE_PORT=4566,SNOWFLAKE_PROTOCOL=http}
 
 usage:                    ## Show this help
 	@grep -Fh "##" $(MAKEFILE_LIST) | grep -Fv fgrep | sed -e 's/:.*##\s*/##/g' | awk -F'##' '{ printf "%-25s %s\n", $$1, $$2 }'
@@ -25,6 +28,7 @@ create-function:  ## Create the Lambda function in LocalStack
 	--timeout 180 \
 	--zip-file fileb://build/function-py.zip \
 	--handler handler.lambda_handler \
+	--environment '$(SNOWFLAKE_ENV)' \
 	--role arn:aws:iam::000000000000:role/lambda-role
 	awslocal lambda wait function-active-v2 --function-name $(FUNCTION_NAME)
 
@@ -37,14 +41,13 @@ local-invoke:   ## Invoke the Lambda locally
 test:          ## Deploy and invoke the function, then check its results
 	./test.sh
 
-start-localstack: ## Start LocalStack for Snowflake
-	LOCALSTACK_DEBUG=1 LOCALSTACK_SF_LOG=trace LOCALSTACK_LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=180 \
-		lstk start --type snowflake --non-interactive --timeout 3m
+start-localstack: ## Start LocalStack for AWS and the Snowflake emulator, and wait until both are healthy
+	SF_LOG=trace docker compose up -d --wait
 
-logs:          ## Show the LocalStack logs
-	lstk logs --tail 300
+logs:          ## Show the logs of both containers
+	docker compose logs --tail 300
 
-stop:          ## Stop LocalStack
-	lstk stop
+stop:          ## Stop and remove both containers
+	docker compose down
 
 .PHONY: usage install zip create-function local-invoke test start-localstack logs stop

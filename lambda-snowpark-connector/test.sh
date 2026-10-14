@@ -33,4 +33,16 @@ for expected in "Total # of rows: 3" "Row-1 => ('John', 'SQL')" "Row-2 => ('Alex
 done
 echo "PASS: the function read the three inserted rows and the current timestamp from Snowflake"
 
+# read the table the function wrote back from the host, on the port the
+# Snowflake emulator is published on, to show the rows landed there
+rows=$(SNOWFLAKE_PASSWORD=test snow sql -q "select name, skill from test.test_schema.ability order by name" \
+  --format json --temporary-connection --account test --user test \
+  --host snowflake.localhost.localstack.cloud --port 4567 2>/dev/null)
+echo "$rows"
+if ! echo "$rows" | jq -e '[.[] | "\(.NAME)=\(.SKILL)"] == ["Alex=Java", "John=SQL", "Pete=Snowflake"]' > /dev/null; then
+  echo "Test failed: the ability table in the Snowflake emulator does not hold the three rows"
+  exit 1
+fi
+echo "PASS: the Snowflake emulator holds the three rows the function inserted"
+
 echo "Test passed: Snowpark connector works from Lambda"

@@ -1,0 +1,52 @@
+# LocalStack for AWS runs the Lambda function, and the Snowflake emulator
+# (snowflake-next, Snowflake only) serves the queries it runs. Lambda containers
+# join the lambda-snowpark network, so the function reaches the Snowflake
+# emulator by its service name.
+services:
+  localstack:
+    container_name: lambda-snowpark-localstack
+    image: localstack/localstack-pro:latest
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
+      - DEBUG=${DEBUG:-1}
+      - LAMBDA_DOCKER_NETWORK=lambda-snowpark
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=180
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 36
+    networks:
+      - lambda-snowpark
+
+  snowflake:
+    container_name: lambda-snowpark-snowflake
+    image: localstack/snowflake-next:latest
+    ports:
+      # 4566 is taken by LocalStack for AWS, so the host reaches Snowflake on 4567
+      - "127.0.0.1:4567:4566"
+    environment:
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
+      - SF_LOG=${SF_LOG:-info}
+      # replaces the built-in list: the service name for the Lambda function,
+      # the default name and localhost for clients on the host
+      - SF_HOSTNAMES=snowflake,snowflake.localhost.localstack.cloud,localhost
+      # init.sf.sql creates the database and schema in the account the function uses
+      - SNOWFLAKE_INIT_ACCOUNT=TEST
+    volumes:
+      - "./init.sf.sql:/etc/localstack/init/ready.d/init.sf.sql"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/4566 && printf 'GET /_localstack/health HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && grep -q available <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+    networks:
+      - lambda-snowpark
+
+networks:
+  lambda-snowpark:
+    name: lambda-snowpark
