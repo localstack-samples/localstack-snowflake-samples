@@ -1,27 +1,38 @@
 # LocalStack Demo: Data Engineering with Apache Airflow, Snowflake, Snowpark, dbt & Cosmos
 
-This project illustrates how to use the LocalStack Snowflake+MWAA to run a data transformation pipeline entirely on your local machine.
+This project illustrates how to use LocalStack for AWS (MWAA and S3) together with the LocalStack Snowflake emulator ([`localstack/snowflake-next`](https://hub.docker.com/r/localstack/snowflake-next)) to run a data transformation pipeline entirely on your local machine.
 
 The code is based on the Snowflake Guide for [Data Engineering with Apache Airflow, Snowflake, Snowpark, dbt & Cosmos](https://quickstarts.snowflake.com/guide/data_engineering_with_apache_airflow).
 
 ## Prerequisites
 - A valid [LocalStack for Snowflake license](https://www.localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
-- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) with [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) environment variable set
+- [Docker](https://docs.docker.com/get-docker/) with Docker Compose
 - [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/#localstack-aws-cli-awslocal)
-- [LocalStack Snowflake emulator](https://snowflake.localstack.cloud/getting-started/installation/)
+- [Snowflake CLI](https://docs.snowflake.com/en/developer-guide/snowflake-cli/installation/installation) (`snow`), used by `make test` to check the result
 
 ## Instructions
 
 ## Start LocalStack
 
-Start LocalStack for Snowflake:
+The Snowflake emulator only emulates Snowflake, so this sample runs two containers with Docker Compose (see `docker-compose.yml`):
+
+- `localstack-aws`: LocalStack for AWS, which runs MWAA and S3, on port 4566
+- `localstack-snowflake`: the Snowflake emulator, on port 4567
+
+Start both and wait until they are healthy:
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 make start
 ```
 
-This runs `lstk start --type snowflake`. The Airflow container that MWAA starts uses LocalStack's DNS server, so it reaches `snowflake.localhost.localstack.cloud` without a custom Docker network.
+How the containers connect:
+
+- `MAIN_DOCKER_NETWORK=airflow-snowflake` makes LocalStack start the MWAA Airflow container on the Compose network, so the DAG reaches the emulator at `http://snowflake:4566`. It uses plain HTTP, since the emulator's TLS certificate is for `snowflake.localhost.localstack.cloud`, not the service name.
+- `SF_HOSTNAMES` lists the hostnames the emulator answers to: `snowflake.localhost.localstack.cloud` for clients on your machine, and `snowflake` for the Airflow container.
+- `init.sf.sql` creates the `test` database at startup. `SNOWFLAKE_INIT_ACCOUNT=TEST` runs it in the account the connections use (`account=test`).
+
+From your machine, connect to `snowflake.localhost.localstack.cloud` on port 4567, as in `profiles.yml`. Stop everything with `make stop`.
 
 ## Deploy the app
 

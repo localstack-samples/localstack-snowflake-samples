@@ -20,12 +20,17 @@ dbt_project_path = Path("/opt/airflow/dags")
 
 SnowflakeUserPasswordProfileMapping.airflow_param_mapping["host"] = "extra.host"
 SnowflakeUserPasswordProfileMapping.airflow_param_mapping["port"] = "extra.port"
+SnowflakeUserPasswordProfileMapping.airflow_param_mapping["protocol"] = "extra.protocol"
 
+# The Snowflake emulator runs in its own container (see docker-compose.yml). The
+# Airflow container shares its network and reaches it by the service name. Use
+# plain HTTP, since the TLS certificate is for snowflake.localhost.localstack.cloud.
 snowflake_connection_params = {
     "user": "test",
     "password": "test",
-    "host": "snowflake.localhost.localstack.cloud",
+    "host": "snowflake",
     "port": 4566,
+    "protocol": "http",
     "account": "test",
     "database": "test",
     "schema": "public",

@@ -24,6 +24,7 @@ poll() {
 }
 airflow() { docker exec "$CONTAINER" airflow "$@" 2>/dev/null; }
 diagnostics() {
+  docker inspect "$CONTAINER" --format '{{json .NetworkSettings.Networks}}' | jq -c 'keys' || true
   docker exec "$CONTAINER" bash -c 'ls -la /opt/airflow/dags; pip show astronomer-cosmos dbt-snowflake 2>&1 | grep -E "^(Name|Version)"' || true
   docker exec "$CONTAINER" airflow dags list-import-errors || true
   docker exec "$CONTAINER" bash -c 'tail -n 40 $(find /opt/airflow/logs -path "*query_result_data*" -name "*.log" | head -1)' || true
@@ -46,6 +47,13 @@ requirements_installed() { docker exec "$CONTAINER" bash -c "pip show astronomer
 poll "the requirements to be installed" 60 10 requirements_installed
 echo "PASS: DAG files synced and requirements installed"
 
+# the Airflow container reaches the Snowflake emulator by its service name
+snowflake_reachable() {
+  docker exec "$CONTAINER" python3 -c "import urllib.request; urllib.request.urlopen('http://snowflake:4566/_localstack/health', timeout=5)" 2> /dev/null
+}
+poll "the Airflow container to reach the Snowflake emulator" 6 5 snowflake_reachable
+echo "PASS: the Airflow container reaches the Snowflake emulator at http://snowflake:4566"
+
 make restart
 dag_loaded() { airflow dags list -o json | jq -e --arg d $DAG_ID 'any(.[]; .dag_id == $d)' > /dev/null 2>&1; }
 poll "the DAG to be loaded" 30 10 dag_loaded
@@ -67,7 +75,9 @@ if [ "$state" != "success" ]; then
 fi
 echo "PASS: the dbt seeds, models and the PREPPED_DATA query succeeded"
 
-rows=$(snow sql -c local --format json -q "SELECT COUNT(*) AS N FROM test.transform.PREPPED_DATA" | jq -r '.. | objects | .N? // empty' | head -1)
+snow connection add --connection-name airflow-dbt --user test --password test --account test \
+  --host snowflake.localhost.localstack.cloud --port 4567 --no-interactive > /dev/null 2>&1 || true
+rows=$(snow sql -c airflow-dbt --format json -q "SELECT COUNT(*) AS N FROM test.transform.PREPPED_DATA" | jq -r '.. | objects | .N? // empty' | head -1)
 if [ "${rows:-0}" -le 0 ]; then
   echo "Test failed: PREPPED_DATA is empty"
   exit 1

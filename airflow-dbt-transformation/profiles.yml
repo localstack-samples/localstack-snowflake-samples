@@ -5,6 +5,7 @@ local:
     dev:
       type: snowflake
       host: snowflake.localhost.localstack.cloud
+      port: 4567
       database: test
       user: test
       password: test

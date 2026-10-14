@@ -5,15 +5,17 @@ usage:		## Shows usage for this Makefile
 
 install:    ## Install dependencies
 	which awslocal || pip install 'awscli-local[ver1]'
+	which snow || pip install snowflake-cli
 
-start:      ## Start LocalStack for Snowflake
-	LOCALSTACK_SF_LOG=trace LOCALSTACK_DEBUG=1 lstk start --type snowflake --non-interactive --timeout 3m
+start:      ## Start LocalStack for AWS and the Snowflake emulator, and wait until both are healthy
+	docker compose up -d --wait
 
-stop:       ## Stop LocalStack
-	lstk stop
+stop:       ## Stop both containers and remove the Airflow container
+	-docker rm -f $(AIRFLOW_CONTAINER)
+	docker compose down
 
-logs:       ## Show the LocalStack logs
-	lstk logs --tail 300
+logs:       ## Show the logs of both containers
+	docker compose logs --tail 300
 
 init:      ## Initialize the Airflow environment in LocalStack MWAA
 	awslocal s3 mb s3://snowflake-airflow

@@ -1,0 +1,53 @@
+# LocalStack for AWS runs MWAA and S3, the Snowflake emulator runs as a second
+# container. MWAA starts its Airflow container on the same network, so the DAG
+# reaches Snowflake by the service name `snowflake`.
+name: airflow-dbt-transformation
+
+services:
+  localstack:
+    container_name: localstack-aws
+    image: localstack/localstack-pro:latest
+    ports:
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4510-4559:4510-4559"
+    environment:
+      - LOCALSTACK_AUTH_TOKEN
+      - DEBUG=${DEBUG:-0}
+      # attach the containers LocalStack starts, such as the MWAA Airflow container, to this network
+      - MAIN_DOCKER_NETWORK=airflow-snowflake
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 36
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - airflow-snowflake
+
+  snowflake:
+    container_name: localstack-snowflake
+    image: localstack/snowflake-next:latest
+    ports:
+      - "127.0.0.1:4567:4566"
+    environment:
+      - LOCALSTACK_AUTH_TOKEN
+      # run init.sf.sql in the account the DAG and dbt connect to (account=test)
+      - SNOWFLAKE_INIT_ACCOUNT=TEST
+      # replaces the built-in list: the default name for clients on your machine,
+      # and the service name for the Airflow container
+      - SF_HOSTNAMES=snowflake.localhost.localstack.cloud,snowflake,localhost
+    healthcheck:
+      # the image has no curl, so send the health request with bash
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/4566 && printf 'GET /_localstack/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q available <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 36
+    volumes:
+      - "./init.sf.sql:/etc/localstack/init/ready.d/init.sf.sql"
+    networks:
+      - airflow-snowflake
+
+networks:
+  airflow-snowflake:
+    name: airflow-snowflake
