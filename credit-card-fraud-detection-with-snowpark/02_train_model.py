@@ -10,17 +10,6 @@ removing mentions of that. Wait to migrate to Docker image
 quay.io/jupyter/datascience-notebook.
 """
 
-import _dummy_load_tables
-# TODO: Implement dummy code for `01_feature_engineering.py`
-
-########## WHERE I STOPPED FILING BUGS ##########
-########## WHERE I STOPPED FILING BUGS ##########
-########## WHERE I STOPPED FILING BUGS ##########
-
-########## WHERE I LEFT OFF ##########
-########## WHERE I LEFT OFF ##########
-########## WHERE I LEFT OFF ##########
-
 import datetime
 import logging
 import os
@@ -39,9 +28,11 @@ import snowflake.snowpark.types as types  # type: ignore
 from snowflake.snowpark import Session  # type: ignore
 from snowflake.snowpark.types import PandasSeries  # type: ignore
 
-# NOTE: Change this to run against Snowflake or LocalStack.
-ENV_FILE = ".env.snowflake"
-# ENV_FILE = '.env.localstack'
+from utils import connection_parameters
+
+# `.env.localstack` connects to the LocalStack Snowflake emulator, and
+# `.env.snowflake` to Snowflake Cloud. The Makefile sets ENV_FILE.
+ENV_FILE = os.getenv("ENV_FILE", ".env.localstack")
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv(ENV_FILE)
@@ -53,17 +44,7 @@ pandas.options.display.max_rows = 100
 
 logging.info(f"Snowpark for Python version {snowpark.__version__}")
 
-connection_parameters = {
-    "account": os.getenv("ACCOUNTNAME"),
-    "user": os.getenv("USERNAME"),
-    "password": os.getenv("PASSWORD"),
-    "role": os.getenv("ROLENAME"),
-    "database": os.getenv("DBNAME"),
-    "schema": os.getenv("SCHEMANAME"),
-    "warehouse": os.getenv("WAREHOUSENAME"),
-}
-
-session = Session.builder.configs(connection_parameters).create()
+session = Session.builder.configs(connection_parameters()).create()
 session.sql_simplifier_enabled = True
 
 
@@ -593,7 +574,11 @@ session.clear_imports()
 session.clear_packages()
 session.add_import("@UDFSTAGE/predict_fraud.joblib")
 session.add_packages(
-    "joblib==1.1.0", "scikit-learn==1.1.1", "cachetools==4.2.2", "pandas==1.3.2"
+    f"joblib=={joblib.__version__}",
+    f"scikit-learn=={sklearn.__version__}",
+    f"cachetools=={cachetools.__version__}",
+    f"pandas=={pandas.__version__}",
+    f"numpy=={numpy.__version__}",
 )
 
 
@@ -628,7 +613,7 @@ def read_file(filename):
 def detect_fraud_batch(ds: PandasSeries[dict]) -> PandasSeries[float]:
     # The dict in the input series will have all columns in the dataframe/table, so
     # we will make sure we only keep those that is used for input to our model
-    df = pandas.io.json.json_normalize(ds)[input_features]
+    df = pandas.json_normalize(ds)[input_features]
     pipeline = read_file("predict_fraud.joblib")
     return pipeline.predict_proba(df)[:, 1]
 
@@ -641,6 +626,7 @@ session.udf.describe(detect_fraud_batch).show()
 df_cust_trx = session.table("CUSTOMER_TRX_FRAUD_FEATURES").filter(
     functions.col("TX_DATETIME") > "2019-07-15 00:00:00"
 )
+
 df_cust_trx.show()
 
 # We can use the function name, **detect_fraud_batch**, when using the Snowpark

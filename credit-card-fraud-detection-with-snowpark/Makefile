@@ -22,7 +22,7 @@ check:
 install: build
 
 start:
-	lstk start --type snowflake --non-interactive --timeout 3m
+	lstk start --type snowflake --image localstack/snowflake-next:latest --non-interactive --timeout 3m
 
 logs:
 	lstk logs --tail 300
@@ -58,14 +58,14 @@ endif
 #
 # NOTE: Make sure you have a `.env.localstack` environment file copied from
 # `.env.sample` into the same directory, and the LocalStack for Snowflake Docker
-# container running and accessible:
-# https://snowflake.localstack.cloud/getting-started/installation/
+# emulator running (`make start`).
 localstack-run: build
 	docker run \
 		--rm \
 		$(DOCKER_RUN_FLAGS) \
 		-v ./:/app \
 		--env-file=.env.localstack \
+		-e ENV_FILE=.env.localstack \
 		--net=host \
 		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
 		bash -c "$(RUN_ARGS)"
@@ -81,6 +81,7 @@ snowflake-run: build
 		$(DOCKER_RUN_FLAGS) \
 		-v ./:/app \
 		--env-file=.env.snowflake \
+		-e ENV_FILE=.env.snowflake \
 		--net=host \
 		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
 		bash -c "$(RUN_ARGS)"
@@ -92,6 +93,7 @@ docker run \
 		$(DOCKER_RUN_FLAGS) \
 		-v ./:/app \
 		--env-file=$(1) \
+		-e ENV_FILE=$(1) \
 		--net=host \
 		$(DOCKER_IMAGE_NAME):$(APP_VERSION) \
 		bash -c "$(2)"
@@ -112,8 +114,11 @@ feature-engineering: build
 train-model: build
 	$(call docker_run,.env.localstack,python 02_train_model.py)
 
+sf-load-tables: build
+	$(call docker_run,.env.snowflake,python 00_load_tables.py)
+
 sf-feature-engineering: build
-	$(call docker_run,.env.snowflake,python 01_feature_engineering.snowflake.py)
+	$(call docker_run,.env.snowflake,python 01_feature_engineering.py)
 
 sf-train-model: build
-	$(call docker_run,.env.snowflake,python 02_train_model.snowflake.py)
+	$(call docker_run,.env.snowflake,python 02_train_model.py)

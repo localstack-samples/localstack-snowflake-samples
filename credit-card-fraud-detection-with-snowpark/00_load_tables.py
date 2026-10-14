@@ -15,9 +15,11 @@ import snowflake.snowpark.functions as functions  # type: ignore
 import snowflake.snowpark.types as types  # type: ignore
 from snowflake.snowpark import Session  # type: ignore
 
-# NOTE: Change this to run against Snowflake or LocalStack.
-# ENV_FILE = ".env.snowflake"
-ENV_FILE = ".env.localstack"
+from utils import connection_parameters
+
+# `.env.localstack` connects to the LocalStack Snowflake emulator, and
+# `.env.snowflake` to Snowflake Cloud. The Makefile sets ENV_FILE.
+ENV_FILE = os.getenv("ENV_FILE", ".env.localstack")
 
 FRAUD_TRANSACTIONS_CSV_GZ = "fraud_transactions.min.csv.gz"
 
@@ -29,26 +31,7 @@ load_dotenv(ENV_FILE)
 
 logging.info(f"Snowpark for Python version {snowpark.__version__}")
 
-# NOTE: Change this to run against Snowflake or LocalStack.
-# snowflake_connection_parameters = {
-#     "account": os.getenv("ACCOUNTNAME"),
-#     "user": os.getenv("USERNAME"),
-#     "password": os.getenv("PASSWORD"),
-#     "role": os.getenv("ROLENAME"),
-#     "database": os.getenv("DBNAME"),
-#     "schema": os.getenv("SCHEMANAME"),
-#     "warehouse": os.getenv("WAREHOUSENAME"),
-# }
-# session = Session.builder.configs(snowflake_connection_parameters).create()
-
-localstack_connection_parameters = {
-    "account": os.getenv("ACCOUNTNAME"),
-    "user": os.getenv("USERNAME"),
-    "password": os.getenv("PASSWORD"),
-    "database": os.getenv("DBNAME"),
-    "host": os.getenv("HOST"),
-}
-session = Session.builder.configs(localstack_connection_parameters).create()
+session = Session.builder.configs(connection_parameters()).create()
 
 # Define Staging Area and the Schema for the transaction table
 #
@@ -94,10 +77,9 @@ dfReader = session.read.schema(dfCustTrxFraudSchema)
 # Get the data into the data frame
 dfCustTrxFraudRd = dfReader.csv(f"@{stage_name}/{FRAUD_TRANSACTIONS_CSV_GZ}")
 
-# Write the dataframe in a table
-ret = dfCustTrxFraudRd.write.mode("overwrite").saveAsTable(
-    "CUSTOMER_TRANSACTIONS_FRAUD"
-)
+# Copy the staged file into a new CUSTOMER_TRANSACTIONS_FRAUD table
+session.sql("DROP TABLE IF EXISTS CUSTOMER_TRANSACTIONS_FRAUD").collect()
+ret = dfCustTrxFraudRd.copy_into_table("CUSTOMER_TRANSACTIONS_FRAUD")
 
 # Read the data from the staging area and create CUSTOMER_TRANSACTIONS_FRAUD,
 # CUSTOMERS and TERMINALS tables
@@ -122,41 +104,5 @@ ret3 = dfTerminals.write.mode("overwrite").saveAsTable("TERMINALS")
 
 logging.info(dfCustTrxFraudTb.show())
 
-
-########## BEGIN LOCALSTACK TODO ##########
-
-# No action needed immediately, but the LocalStack Snowflake emulator currently
-# does not close any sessions, as function `CANCEL_ALL_QUERIES` does not exist.
-# This does not block execution of the demo, but may be a problem for
-# long-running Snowflake emulators. Trace below:
-#
-# ```bash
-# Traceback (most recent call last):
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/session.py", line 507, in close
-#     self.cancel_all()
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/session.py", line 593, in cancel_all
-#     self._conn.run_query(f"select system$cancel_all_queries({self._session_id})")
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/_internal/server_connection.py", line 123, in wrap
-#     raise ex
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/_internal/server_connection.py", line 117, in wrap
-#     return func(*args, **kwargs)
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/_internal/server_connection.py", line 417, in run_query
-#     raise ex
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/_internal/server_connection.py", line 402, in run_query
-#     results_cursor = self.execute_and_notify_query_listener(
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/snowpark/_internal/server_connection.py", line 354, in execute_and_notify_query_listener
-#     results_cursor = self._cursor.execute(query, **kwargs)
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/connector/cursor.py", line 1080, in execute
-#     Error.errorhandler_wrapper(self.connection, self, error_class, errvalue)
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/connector/errors.py", line 290, in errorhandler_wrapper
-#     handed_over = Error.hand_to_other_handler(
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/connector/errors.py", line 345, in hand_to_other_handler
-#     cursor.errorhandler(connection, cursor, error_class, error_value)
-#   File "/usr/local/lib/python3.8/site-packages/snowflake/connector/errors.py", line 221, in default_errorhandler
-#     raise error_class(
-# snowflake.connector.errors.ProgrammingError: 002002 (42710): b74129c0-0470-46eb-8837-0969d2c400c7: function SYSTEM$CANCEL_ALL_QUERIES(integer) does not exist
-# ```
-
-########## END LOCALSTACK TODO ##########
 
 session.close()

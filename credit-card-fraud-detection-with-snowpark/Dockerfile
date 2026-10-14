@@ -1,4 +1,4 @@
-FROM python:3.8.19-bullseye
+FROM python:3.11-bookworm
 LABEL maintainer="LocalStack <info@localstack.cloud>"
 LABEL application="localstack-credit-card-fraud-detection"
 
