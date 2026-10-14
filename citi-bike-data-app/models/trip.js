@@ -52,28 +52,26 @@ Trip.countByDayOfWeek = (start_date, end_date, cb) => {
   }
 }
 
-// Temperatures are grouped in steps of 10 degrees with round(x / 10) * 10, the
-// same as round(x, -1), which the Snowflake emulator does not support.
 Trip.countByTemperature = (start_date, end_date, cb) => {
   // check if filtering on date range
   if (start_date && end_date) {
     var sql = 'with weather_trips as (select * from trips t ' +
                     'inner join weather w ' +
                     'on date_trunc(\'day\', t.starttime) = w.observation_date) ' +
-                    'select round(temp_avg_f / 10) * 10 as temp, count(*) as trip_count ' +
+                    'select round(temp_avg_f, -1) as temp, count(*) as trip_count ' +
                     'from weather_trips ' +
                     'where starttime between ? and ? ' +
-                    'group by round(temp_avg_f / 10) * 10 ' +
-                    'order by round(temp_avg_f / 10) * 10 asc;';
+                    'group by round(temp_avg_f, -1) ' +
+                    'order by round(temp_avg_f, -1) asc;';
     snowflake.query(sql, [start_date, end_date]).then(rows => {cb(null, rows)}).catch(err => {cb(err, null)});
   } else {
     var sql = 'with weather_trips as (select * from trips t ' +
                     'inner join weather w ' +
                     'on date_trunc(\'day\', t.starttime) = w.observation_date) ' +
-                    'select round(temp_avg_f / 10) * 10 as temp, count(*) as trip_count ' +
+                    'select round(temp_avg_f, -1) as temp, count(*) as trip_count ' +
                     'from weather_trips ' +
-                    'group by round(temp_avg_f / 10) * 10 ' +
-                    'order by round(temp_avg_f / 10) * 10 asc;';
+                    'group by round(temp_avg_f, -1) ' +
+                    'order by round(temp_avg_f, -1) asc;';
     snowflake.query(sql).then(rows => {cb(null, rows)}).catch(err => {cb(err, null)});
   }
 }

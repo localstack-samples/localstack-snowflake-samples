@@ -2,12 +2,10 @@
 usage:				## Shows usage for this Makefile
 	@cat Makefile | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-start:			## Start LocalStack for Snowflake
+start:			## Start the Snowflake emulator (snowflake-next)
 	LOCALSTACK_DNS_NAME_PATTERNS_TO_RESOLVE_UPSTREAM=demo-citibike-data.s3.amazonaws.com \
-		LOCALSTACK_SF_LOG=trace \
-		LOCALSTACK_SF_CSV_IMPORT_MAX_ROWS=20000 \
 		LOCALSTACK_DEBUG=1 \
-		lstk start --type snowflake --non-interactive --timeout 3m
+		lstk start --type snowflake --image localstack/snowflake-next:latest --non-interactive --timeout 3m
 
 stop:			## Stop LocalStack
 	lstk stop
@@ -30,6 +28,7 @@ seed:			## Seed test data into LocalStack Snowflake
 # 	snow sql -c local --query 'copy into trips from @citibike_trips file_format=csv PATTERN = '"'"'.*csv.*'"'"
 
     # see: https://quickstarts.snowflake.com/guide/data_app/index.html#3
+	snow sql -c local --query "create database if not exists test; create warehouse if not exists test"
 	snow sql -c local --database test --schema public --query "create stage demo_data url='s3://demo-citibike-data'"
     # create 'trips' table and import data from public CSV files
 	snow sql -c local --database test --schema public --query 'create or replace table trips(tripduration integer,starttime timestamp,stoptime timestamp,start_station_id integer,end_station_id integer,bikeid integer,usertype string,birth_year integer,gender integer);'
