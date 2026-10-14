@@ -2,12 +2,14 @@
 
 This repository contains sample projects that can be deployed on LocalStack for Snowflake to demonstrate local development and testing workflows for Snowflake data applications.
 
+The samples run on the next-generation Snowflake emulator, [`localstack/snowflake-next`](https://hub.docker.com/r/localstack/snowflake-next). It emulates Snowflake only, so the samples that also use AWS services run LocalStack AWS next to it with Docker Compose.
+
 ## Prerequisites
 
-- A valid [LocalStack for Snowflake license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
+- A valid [LocalStack for Snowflake license](https://localstack.cloud/pricing) with access to the Snowflake Next preview. Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/).
 - [Docker](https://docs.docker.com/get-docker/)
-- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/), which starts the Snowflake emulator with `lstk start --type snowflake`
-- [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) for the samples that also use AWS services
+- [`lstk`](https://docs.localstack.cloud/snowflake/developer-tools/lstk/) 1.3.0 or later, which starts the emulator with `lstk start --type snowflake --image localstack/snowflake-next:latest`
+- [Docker Compose](https://docs.docker.com/compose/) and the [`awslocal` CLI](https://docs.localstack.cloud/user-guide/integrations/aws-cli/) for the samples that also use AWS services: `airflow-dbt-transformation`, `glue-snowflake-integration`, `lambda-snowpark-connector` and `multi-container`. Each of them has a `docker-compose.yml` that starts LocalStack AWS on port 4566 and Snowflake Next on a second port.
 - [Snowflake CLI](https://docs.snowflake.com/en/developer-guide/snowflake-cli/installation/installation) (`snow`) with a `local` and a `localstack` connection, see below
 
 ## Configuration
@@ -45,6 +47,8 @@ done
 | [streamlit-snowpark-dynamic-filters](./streamlit-snowpark-dynamic-filters) | Streamlit application with dynamic Snowpark-powered filters. |
 
 ## Testing
+
+A fresh Snowflake Next instance only has the `SNOWFLAKE` database, as in a new Snowflake account, so each sample creates the database it uses before loading data.
 
 Every sample has `make start` (or `make start-localstack` where `make start` runs the app) to start LocalStack, and `make test` to check that the sample works. The [CI workflow](.github/workflows/main.yml) runs `make install`, the start target and `make test` for each sample on every pull request.
 
