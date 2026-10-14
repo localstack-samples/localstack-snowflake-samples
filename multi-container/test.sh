@@ -4,11 +4,18 @@
 # 2. Snowflake loads a CSV from an S3 bucket in the AWS container through a stage
 set -euo pipefail
 
-# the image has no curl, so open the session with Python
-response=$(docker exec localstack-aws python3 -c "import urllib.request; print(urllib.request.urlopen(urllib.request.Request('http://localstack-snowflake:4567/session', data=b'{}')).read().decode())")
-echo "Snowflake session response from the AWS container: $response"
+# log in by container name, the way a client inside the Docker network would.
+# The image has no curl, so send the request with Python
+response=$(docker exec localstack-aws python3 -c "
+import json, urllib.request
+body = json.dumps({'data': {'LOGIN_NAME': 'test', 'PASSWORD': 'test', 'ACCOUNT_NAME': 'test'}}).encode()
+req = urllib.request.Request('http://localstack-snowflake:4567/session/v1/login-request', data=body,
+                             headers={'Content-Type': 'application/json'})
+print(json.dumps({'success': json.load(urllib.request.urlopen(req))['success']}))
+")
+echo "Snowflake login response from the AWS container: $response"
 if ! echo "$response" | jq -e '.success == true' > /dev/null; then
-  echo "Test failed: the AWS container could not open a Snowflake session"
+  echo "Test failed: the AWS container could not log in to the Snowflake emulator"
   exit 1
 fi
 echo "PASS: the AWS container reached the Snowflake emulator"

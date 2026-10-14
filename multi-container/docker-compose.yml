@@ -1,35 +1,35 @@
 services:
   localstack-snowflake:
     container_name: "localstack-snowflake"
-    image: localstack/snowflake:latest
+    image: localstack/snowflake-next:latest
     networks:
       - localstack
     ports:
-      - "4567:4567"
+      - "127.0.0.1:4567:4567"
     environment:
-      - DEBUG=true # set to "true" to enable debug logging
-      - GATEWAY_LISTEN=0.0.0.0:4567
       - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
-      # hostnames routed to the Snowflake emulator: the container name for
-      # requests from the AWS container, and the default name for host clients
-      - SF_HOSTNAMES=localstack-snowflake,snowflake.localhost.localstack.cloud
-      # S3 endpoints of the AWS container, for stages that load data from S3
+      - SF_LOG=${SF_LOG:-info}
+      - GATEWAY_LISTEN=0.0.0.0:4567
+      # hostnames routed to the Snowflake emulator. The list replaces the
+      # built-in one: the default name for host clients (first entry, also the
+      # advertised API host), and the container name for the AWS container
+      - SF_HOSTNAMES=snowflake.localhost.localstack.cloud,localstack-snowflake
+      # S3 endpoint of the AWS container, for external stages on s3:// URLs
       - SF_S3_ENDPOINT=http://localstack-aws:4566
-      - SF_S3_ENDPOINT_EXTERNAL=http://localhost:4566
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4567/_localstack/health')"]
-      interval: 10s
+      # the image has bash but no curl or python
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/4567 && printf 'GET /_localstack/health HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q available <&3"]
+      interval: 5s
       timeout: 5s
-      retries: 12
+      retries: 24
     volumes:
       - "./volume/snowflake:/var/lib/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
 
   localstack-aws:
     container_name: "localstack-aws"
     image: localstack/localstack:latest
     ports:
-      - "4566:4566"
+      - "127.0.0.1:4566:4566"
     environment:
       - DEBUG=${DEBUG:-0}
       - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:-}
