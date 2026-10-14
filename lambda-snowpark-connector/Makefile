@@ -44,7 +44,8 @@ test:          ## Deploy and invoke the function, then check its results
 start-localstack: ## Start LocalStack for AWS and the Snowflake emulator, and wait until both are healthy
 	SF_LOG=trace docker compose up -d --wait
 
-logs:          ## Show the logs of both containers
+logs:          ## Show the health and logs of both containers
+	docker inspect --format '{{json .State.Health}}' lambda-snowpark-localstack lambda-snowpark-snowflake
 	docker logs --tail 300 lambda-snowpark-localstack
 	docker logs --tail 300 lambda-snowpark-snowflake
 
