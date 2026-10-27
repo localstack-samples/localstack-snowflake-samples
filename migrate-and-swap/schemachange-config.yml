@@ -1,0 +1,9 @@
+# schemachange 4.4 configuration. Connection settings are not stored here:
+# release.deploy passes them as SNOWFLAKE_* variables in a scrubbed environment,
+# plus --root-folder, --change-history-table and --vars for the target schema.
+config-version: 2
+
+schemachange:
+  root-folder: migrations
+  create-change-history-table: true
+  query-tag: migrate-and-swap

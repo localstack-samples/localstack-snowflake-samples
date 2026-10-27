@@ -1,0 +1,87 @@
+models:
+  - name: stg_trips
+    description: One row per raw TLC trip record, renamed and typed (money as NUMBER(10,2)).
+    columns:
+      - name: pickup_at
+        data_tests: [not_null]
+      - name: total_amount
+        description: Passenger-paid total. Negative for voids and refunds.
+
+  - name: stg_taxi_zones
+    description: TLC taxi zones from the taxi_zone_lookup seed.
+    columns:
+      - name: location_id
+        data_tests: [unique, not_null]
+
+  - name: int_trips_enriched
+    description: >
+      Billable trips (total_amount >= 0) in the reporting month, one row per
+      trip, keyed by a surrogate trip_id and enriched with pickup and dropoff
+      zone names. Incremental MERGE on trip_id with a lookback window.
+    columns:
+      - name: trip_id
+        description: MD5 of vendor, pickup and dropoff timestamps and zones, plus natural_key_seq.
+        data_tests: [unique, not_null]
+      - name: natural_key_seq
+        description: 1 for the first record with a given natural key, 2 for a repeat, and so on.
+      - name: pickup_date
+        data_tests: [not_null]
+      - name: pickup_location_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_taxi_zones')
+                field: location_id
+
+  - name: fct_daily_zone_revenue
+    description: Trips and revenue per pickup zone per day.
+    columns:
+      - name: daily_zone_id
+        description: Surrogate key of (pickup_date, pickup_location_id), the grain of this table.
+        data_tests: [unique, not_null]
+      - name: revenue
+        description: Sum of total_amount of billable trips.
+        data_tests: [not_null]
+      - name: trip_count
+        data_tests: [not_null]
+
+unit_tests:
+  - name: int_trips_enriched_keys_repeats_and_drops_refunds
+    description: >
+      Two records with the same natural key both survive with distinct
+      natural_key_seq values; refunds and trips outside the reporting month
+      are dropped; zone names come from the zone lookup.
+    model: int_trips_enriched
+    overrides:
+      macros:
+        is_incremental: false
+    given:
+      - input: ref('stg_trips')
+        rows:
+          - {vendor_id: 2, pickup_at: "2024-01-15 08:00:00", dropoff_at: "2024-01-15 08:40:00", pickup_location_id: 132, dropoff_location_id: 236, total_amount: 70.25, _source_file: "yellow/2024-01/a.parquet", _source_row: 1}
+          - {vendor_id: 2, pickup_at: "2024-01-15 08:00:00", dropoff_at: "2024-01-15 08:40:00", pickup_location_id: 132, dropoff_location_id: 236, total_amount: 70.25, _source_file: "yellow/2024-01/a.parquet", _source_row: 2}
+          - {vendor_id: 1, pickup_at: "2024-01-15 09:00:00", dropoff_at: "2024-01-15 09:10:00", pickup_location_id: 236, dropoff_location_id: 132, total_amount: -12.50, _source_file: "yellow/2024-01/a.parquet", _source_row: 3}
+          - {vendor_id: 1, pickup_at: "2023-12-31 23:50:00", dropoff_at: "2024-01-01 00:05:00", pickup_location_id: 236, dropoff_location_id: 132, total_amount: 18.00, _source_file: "yellow/2024-01/a.parquet", _source_row: 4}
+      - input: ref('stg_taxi_zones')
+        rows:
+          - {location_id: 132, borough: Queens, zone_name: JFK Airport, service_zone: Airports}
+          - {location_id: 236, borough: Manhattan, zone_name: Upper East Side North, service_zone: Yellow Zone}
+    expect:
+      rows:
+        - {natural_key_seq: 1, pickup_date: "2024-01-15", pickup_zone: JFK Airport, dropoff_zone: Upper East Side North, trip_duration_seconds: 2400, total_amount: 70.25}
+        - {natural_key_seq: 2, pickup_date: "2024-01-15", pickup_zone: JFK Airport, dropoff_zone: Upper East Side North, trip_duration_seconds: 2400, total_amount: 70.25}
+
+  - name: fct_daily_zone_revenue_sums_total_amount
+    description: Revenue is the sum of total_amount per pickup zone and day; fare and tips are reported separately.
+    model: fct_daily_zone_revenue
+    given:
+      - input: ref('int_trips_enriched')
+        rows:
+          - {pickup_date: "2024-01-15", pickup_location_id: 132, pickup_borough: Queens, pickup_zone: JFK Airport, fare_amount: 70.00, tip_amount: 15.00, total_amount: 95.25, trip_distance_miles: 17.1}
+          - {pickup_date: "2024-01-15", pickup_location_id: 132, pickup_borough: Queens, pickup_zone: JFK Airport, fare_amount: 52.80, tip_amount: 0.00, total_amount: 64.55, trip_distance_miles: 12.9}
+          - {pickup_date: "2024-01-16", pickup_location_id: 132, pickup_borough: Queens, pickup_zone: JFK Airport, fare_amount: 19.80, tip_amount: 4.00, total_amount: 30.30, trip_distance_miles: 3.0}
+    expect:
+      rows:
+        - {pickup_date: "2024-01-15", pickup_location_id: 132, trip_count: 2, revenue: 159.80, fare_revenue: 122.80, tip_revenue: 15.00, avg_trip_distance_miles: 15.00}
+        - {pickup_date: "2024-01-16", pickup_location_id: 132, trip_count: 1, revenue: 30.30, fare_revenue: 19.80, tip_revenue: 4.00, avg_trip_distance_miles: 3.00}

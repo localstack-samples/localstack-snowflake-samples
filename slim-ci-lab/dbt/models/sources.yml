@@ -1,0 +1,17 @@
+sources:
+  - name: tlc
+    description: NYC Taxi and Limousine Commission trip records, landed by the loader (PUT + COPY INTO).
+    database: "{{ target.database }}"
+    schema: raw
+    loaded_at_field: _loaded_at
+    tables:
+      - name: trips
+        description: >
+          Yellow taxi trips for the pinned month, downsampled 1 in 300. Column
+          names follow the TLC data dictionary; the loader adds _source_file,
+          _source_row and _loaded_at from COPY INTO metadata.
+        columns:
+          - name: tpep_pickup_datetime
+            data_tests: [not_null]
+          - name: _source_file
+            data_tests: [not_null]

@@ -1,0 +1,111 @@
+# PHI access contract
+#
+# The single source of truth for who may see what. Compliance reviews this file;
+# tests/test_access_matrix.py turns every cell into one test case and runs it
+# against the deployed database as the persona's own user and role. A change to
+# a policy that breaks a cell fails CI; a change to this file is a change to the
+# access rules and goes through review.
+#
+# Outcomes
+#   rows     all       every row of the object
+#            facility  only rows of the persona's facilities (facility_column)
+#            none      the query succeeds and returns no rows
+#            denied    the query fails with an authorization error (002003 or 003001)
+#   columns  clear     the stored value
+#            masked    '***MASKED***' for text; 1 January of the same year for dates and timestamps
+# A column lists one cell per persona that can see rows of the object.
+#
+# phi_type is the PHI_TYPE tag value the column must carry (null: not PHI). Views
+# list no phi_type: their columns inherit protection from the base table.
+
+version: 1
+
+personas:
+  CLINICIAN:      {user: PERSONA_CLINICIAN,      facilities: [101]}
+  CLINICIAN_LEAD: {user: PERSONA_CLINICIAN_LEAD, facilities: [101, 102]}
+  ANALYST:        {user: PERSONA_ANALYST}
+  AUDITOR:        {user: PERSONA_AUDITOR}
+  DATA_ENGINEER:  {user: PERSONA_DATA_ENGINEER}
+
+objects:
+  CLINICAL.FACILITIES:
+    key: [FACILITY_ID]
+    rows: {CLINICIAN: all, CLINICIAN_LEAD: all, ANALYST: all, AUDITOR: all, DATA_ENGINEER: all}
+    columns:
+      FACILITY_ID:            {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      NAME:                   {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      ADDRESS:                {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      CITY:                   {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      STATE:                  {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      ZIP:                    {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      PHONE:                  {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+      SOURCE_ORGANIZATION_ID: {phi_type: null, CLINICIAN: clear, CLINICIAN_LEAD: clear, ANALYST: clear, AUDITOR: clear, DATA_ENGINEER: clear}
+
+  CLINICAL.PATIENTS:
+    key: [PATIENT_ID]
+    facility_column: PRIMARY_FACILITY_ID
+    rows: {CLINICIAN: facility, CLINICIAN_LEAD: facility, ANALYST: denied, AUDITOR: all, DATA_ENGINEER: none}
+    columns:
+      PATIENT_ID:          {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      PRIMARY_FACILITY_ID: {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      FIRST_NAME:          {phi_type: name,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      LAST_NAME:           {phi_type: name,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      BIRTH_DATE:          {phi_type: birth_date,      CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      DEATH_DATE:          {phi_type: death_date,      CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      SSN:                 {phi_type: ssn,             CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      DRIVERS_LICENSE:     {phi_type: license_number,  CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      PASSPORT:            {phi_type: passport_number, CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      GENDER:              {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      RACE:                {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      ETHNICITY:           {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      MARITAL_STATUS:      {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      ADDRESS:             {phi_type: address,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      CITY:                {phi_type: address,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      COUNTY:              {phi_type: address,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      STATE:               {phi_type: null,            CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      ZIP:                 {phi_type: zip,             CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      EMAIL:               {phi_type: email,           CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}  # V1.3.0
+
+  CLINICAL.ENCOUNTERS:
+    key: [ENCOUNTER_ID]
+    facility_column: FACILITY_ID
+    rows: {CLINICIAN: facility, CLINICIAN_LEAD: facility, ANALYST: denied, AUDITOR: all, DATA_ENGINEER: none}
+    columns:
+      ENCOUNTER_ID:       {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      PATIENT_ID:         {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      FACILITY_ID:        {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      START_TS:           {phi_type: service_date, CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      STOP_TS:            {phi_type: service_date, CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: masked}
+      ENCOUNTER_CLASS:    {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      CODE:               {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      DESCRIPTION:        {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      REASON_CODE:        {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      REASON_DESCRIPTION: {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      TOTAL_CLAIM_COST:   {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+      PAYER_COVERAGE:     {phi_type: null,         CLINICIAN: clear, CLINICIAN_LEAD: clear, AUDITOR: clear}
+
+  ANALYTICS.ENCOUNTER_SUMMARY:
+    key: [FACILITY_ID, ENCOUNTER_YEAR, ENCOUNTER_CLASS]
+    rows: {CLINICIAN: denied, CLINICIAN_LEAD: denied, ANALYST: all, AUDITOR: denied, DATA_ENGINEER: denied}
+    columns:
+      FACILITY_ID:      {ANALYST: clear}
+      FACILITY_NAME:    {ANALYST: clear}
+      ENCOUNTER_YEAR:   {ANALYST: clear}
+      ENCOUNTER_CLASS:  {ANALYST: clear}
+      ENCOUNTERS:       {ANALYST: clear}
+      PATIENTS:         {ANALYST: clear}
+      TOTAL_CLAIM_COST: {ANALYST: clear}
+
+  ANALYTICS.PATIENT_COHORT:
+    key: [PATIENT_ID]
+    rows: {CLINICIAN: denied, CLINICIAN_LEAD: denied, ANALYST: all, AUDITOR: denied, DATA_ENGINEER: denied}
+    columns:
+      PATIENT_ID:          {ANALYST: clear}
+      PRIMARY_FACILITY_ID: {ANALYST: clear}
+      BIRTH_DATE:          {ANALYST: masked}
+      GENDER:              {ANALYST: clear}
+      RACE:                {ANALYST: clear}
+      ETHNICITY:           {ANALYST: clear}
+      STATE:               {ANALYST: clear}
+      ZIP:                 {ANALYST: masked}
+      EMAIL:               {ANALYST: masked}  # V1.3.0: masked with no new policy code
