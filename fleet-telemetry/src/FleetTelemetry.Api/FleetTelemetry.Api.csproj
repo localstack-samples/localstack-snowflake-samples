@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>FleetTelemetry.Api</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FleetTelemetry.Data\FleetTelemetry.Data.csproj" />
+  </ItemGroup>
+
+</Project>

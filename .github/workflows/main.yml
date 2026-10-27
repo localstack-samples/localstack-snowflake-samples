@@ -9,6 +9,9 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    # nightly regression run against the newest snowflake-next image
+    - cron: '17 3 * * *'
   workflow_dispatch:
 
 permissions:
@@ -25,14 +28,22 @@ jobs:
         sample:
           - airflow-dbt-transformation
           - citi-bike-data-app
+          - claims-service
           - credit-card-fraud-detection-with-snowpark
           - credit-scoring-with-snowpark
+          - fleet-telemetry
           - glue-snowflake-integration
           - lambda-snowpark-connector
+          - metering-api
+          - migrate-and-swap
           - multi-container
+          - order-to-cash-cdc
+          - phi-guardrails
           - predicting-customer-spend
+          - slim-ci-lab
           - soda-data-quality-checks
           - streamlit-snowpark-dynamic-filters
+          - tenantboard
     defaults:
       run:
         working-directory: ${{ matrix.sample }}
@@ -60,6 +71,33 @@ jobs:
         with:
           terraform_wrapper: false
 
+      - name: Setup uv
+        if: hashFiles(format('{0}/uv.lock', matrix.sample)) != ''
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Setup Java
+        if: hashFiles(format('{0}/pom.xml', matrix.sample)) != ''
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Setup Go
+        if: hashFiles(format('{0}/go.mod', matrix.sample)) != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ matrix.sample }}/go.mod
+          cache-dependency-path: ${{ matrix.sample }}/go.sum
+
+      - name: Setup .NET
+        if: hashFiles(format('{0}/global.json', matrix.sample)) != ''
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ${{ matrix.sample }}/global.json
+
       - name: Install lstk and the Snowflake and AWS CLIs
         run: |
           npm install -g @localstack/lstk
@@ -80,8 +118,14 @@ jobs:
           if grep -q '^start-localstack:' Makefile; then make start-localstack; else make start; fi
 
       - name: Run tests
+        env:
+          # samples tested with Testcontainers start their own emulator
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         run: make test
 
       - name: Show LocalStack logs
         if: failure()
+        env:
+          # docker compose refuses to read a compose file that requires the token
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
         run: make logs || true

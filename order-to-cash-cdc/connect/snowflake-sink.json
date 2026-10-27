@@ -1,0 +1,26 @@
+{
+  "name": "o2c-orders-cdc-sink",
+  "config": {
+    "connector.class": "com.snowflake.kafka.connector.SnowflakeSinkConnector",
+    "tasks.max": "1",
+    "topics": "orders.cdc",
+    "snowflake.topic2table.map": "orders.cdc:ORDERS_CDC",
+    "snowflake.url.name": "https://snowflake.localhost.localstack.cloud:4566",
+    "snowflake.user.name": "SAMPLE_SVC",
+    "snowflake.role.name": "O2C_INGEST",
+    "snowflake.private.key": "${file:/opt/connect/secrets/connector.properties:snowflake.private.key}",
+    "snowflake.database.name": "O2C",
+    "snowflake.schema.name": "RAW",
+    "snowflake.ingestion.method": "SNOWPIPE_STREAMING",
+    "snowflake.enable.schematization": "false",
+    "enable.streaming.channel.offset.migration": "false",
+    "buffer.count.records": "500",
+    "buffer.flush.time": "2",
+    "buffer.size.bytes": "5000000",
+    "errors.tolerance": "none",
+    "errors.log.enable": "true",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false"
+  }
+}

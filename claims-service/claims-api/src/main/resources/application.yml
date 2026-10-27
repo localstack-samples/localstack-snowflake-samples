@@ -1,0 +1,39 @@
+# Defaults target the Snowflake-Next emulator. For a real account activate the
+# "cloud" profile (application-cloud.yml), which reads the SNOWFLAKE_* variables.
+spring:
+  application:
+    name: claims-service
+  mvc:
+    problemdetails:
+      enabled: true
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    default-schema: ${claims.snowflake.schema}
+    # "scheduled" also RESUMEs the KPI task so it runs every 5 minutes; without it the
+    # task stays suspended and runs only on EXECUTE TASK (tests, POST /api/kpis/refresh).
+    contexts: ${CLAIMS_LIQUIBASE_CONTEXTS:default}
+    parameters:
+      warehouse: ${claims.snowflake.warehouse}
+      appSchema: ${claims.snowflake.database}.${claims.snowflake.schema}
+      appRole: ${claims.snowflake.role}
+
+claims:
+  snowflake:
+    url: jdbc:snowflake://snowflake.localhost.localstack.cloud:${SNOWFLAKE_PORT:4566}/
+    account: snowflake
+    user: SAMPLE_SVC
+    private-key-path: ${SNOWFLAKE_PRIVATE_KEY_PATH:.secrets/rsa_key.p8}
+    role: CLAIMS_APP
+    warehouse: CLAIMS_WH
+    database: CLAIMS
+    schema: CORE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    net.snowflake: WARN

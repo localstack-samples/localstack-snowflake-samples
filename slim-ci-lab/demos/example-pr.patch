@@ -1,0 +1,19 @@
+Subject: [PATCH] fct_daily_zone_revenue: add tip_rate
+
+Tips as a share of fares, for the driver-earnings dashboard.
+
+(Example pull request used by `make ci-local`: it modifies one mart, so
+Slim CI builds only that model and its tests, deferring every upstream
+reference to production.)
+---
+--- a/models/marts/fct_daily_zone_revenue.sql
++++ b/models/marts/fct_daily_zone_revenue.sql
+@@ -10,6 +10,8 @@
+     sum(total_amount) as revenue,
+     sum(fare_amount) as fare_revenue,
+     sum(tip_amount) as tip_revenue,
++    -- Tips as a share of fares, for the driver-earnings dashboard.
++    round(sum(tip_amount) / nullif(sum(fare_amount), 0), 4) as tip_rate,
+     round(avg(trip_distance_miles), 2) as avg_trip_distance_miles
+ from {{ ref('int_trips_enriched') }}
+ group by pickup_date, pickup_location_id, pickup_borough, pickup_zone

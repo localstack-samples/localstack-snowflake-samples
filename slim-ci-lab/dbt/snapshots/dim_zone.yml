@@ -1,0 +1,16 @@
+snapshots:
+  - name: dim_zone
+    description: >
+      Type 2 history of TLC taxi zones. A changed borough, zone name or service
+      zone closes the current row and opens a new one; a zone removed from the
+      lookup gets a new row with dbt_is_deleted = 'True'.
+    relation: ref('stg_taxi_zones')
+    config:
+      schema: snapshots
+      unique_key: location_id
+      strategy: check
+      check_cols: [borough, zone_name, service_zone]
+      hard_deletes: new_record
+    columns:
+      - name: location_id
+        data_tests: [not_null]
