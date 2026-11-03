@@ -1,0 +1,47 @@
+name: slim_ci_lab
+version: "1.0.0"
+config-version: 2
+profile: slim_ci_lab
+require-dbt-version: [">=1.10.0", "<1.11.0"]
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+clean-targets: ["target", "logs"]
+
+flags:
+  send_anonymous_usage_stats: false
+
+vars:
+  # The month of TLC data this project reports on. Trips outside it (the TLC
+  # files carry a few stray timestamps) are excluded from the marts.
+  reporting_start: "2024-01-01"
+  reporting_end: "2024-02-01"
+  # Incremental runs re-merge this many days before the latest loaded pickup,
+  # so late or corrected trips update in place instead of being skipped.
+  incremental_lookback_days: 3
+
+models:
+  slim_ci_lab:
+    +persist_docs:
+      relation: true
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+    marts:
+      +schema: marts
+      +materialized: table
+
+seeds:
+  slim_ci_lab:
+    +schema: reference
+    taxi_zone_lookup:
+      +column_types:
+        LocationID: integer
+        Borough: varchar(32)
+        Zone: varchar(64)
+        service_zone: varchar(32)

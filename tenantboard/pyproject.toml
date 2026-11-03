@@ -1,0 +1,45 @@
+[project]
+name = "tenantboard"
+version = "0.1.0"
+description = "A multi-tenant analytics API where tenant isolation and PII masking are enforced by Snowflake policies"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = "==3.12.*"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.32,<1",
+    "pydantic>=2.9,<3",
+    "pydantic-settings>=2.6,<3",
+    "python-multipart>=0.0.12",
+    "snowflake-connector-python[aio,pandas]>=5.1,<6",
+    "cryptography>=43",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-xdist>=3.6,<4",
+    "httpx>=0.27,<1",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+filterwarnings = [
+    # starlette's TestClient announces a future httpx successor; nothing to act on yet.
+    "ignore::DeprecationWarning:fastapi.testclient",
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "I"]
+# The formatter wraps code at line-length; long SQL strings stay whole.
+ignore = ["E501"]

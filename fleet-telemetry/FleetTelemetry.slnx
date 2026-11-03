@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FleetTelemetry.Api/FleetTelemetry.Api.csproj" />
+    <Project Path="src/FleetTelemetry.Core/FleetTelemetry.Core.csproj" />
+    <Project Path="src/FleetTelemetry.Data/FleetTelemetry.Data.csproj" />
+    <Project Path="src/FleetTelemetry.Ingest/FleetTelemetry.Ingest.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FleetTelemetry.IntegrationTests/FleetTelemetry.IntegrationTests.csproj" />
+    <Project Path="tests/FleetTelemetry.UnitTests/FleetTelemetry.UnitTests.csproj" />
+  </Folder>
+</Solution>

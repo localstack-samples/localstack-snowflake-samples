@@ -1,0 +1,10 @@
+seeds:
+  - name: taxi_zone_lookup
+    description: >
+      NYC TLC taxi zone lookup, committed as published at
+      https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+      (SHA-256 1a99e105092230f8620f301edcca7f80d3080642ff404d28ed957d3fa222c8ed),
+      with line endings normalised to LF.
+    columns:
+      - name: LocationID
+        data_tests: [unique, not_null]

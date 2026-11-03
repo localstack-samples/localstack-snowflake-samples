@@ -1,0 +1,20 @@
+# Liquibase OSS (built-in Snowflake support) migrates the service schema at startup.
+# The database, schema, warehouse and role are provisioned by an administrator
+# beforehand (init/01_platform.sf.sql); the service only owns objects inside its schema.
+databaseChangeLog:
+  - include:
+      file: sql/001-schema.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: sql/001-icd10-function.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/002-adjudicate-procedure.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/003-kpi-stream-task.sql
+      relativeToChangelogFile: true
+  - include:
+      file: sql/004-reference-data.sql
+      relativeToChangelogFile: true

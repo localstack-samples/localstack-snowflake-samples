@@ -1,0 +1,20 @@
+Subject: [PATCH] int_trips_enriched: merge on the reporting grain
+
+The daily mart only needs one row per pickup zone and day, so key the
+incremental merge on (pickup_location_id, pickup_date) instead of trip_id.
+
+(Demo patch: this key is not unique. The first run builds the table with
+CREATE TABLE AS and every test passes; the second run is a MERGE, and
+Snowflake rejects it with 100090 "Duplicate row detected during DML action".)
+---
+--- a/models/intermediate/int_trips_enriched.sql
++++ b/models/intermediate/int_trips_enriched.sql
+@@ -2,7 +2,7 @@
+     config(
+         materialized='incremental',
+         incremental_strategy='merge',
+-        unique_key='trip_id',
++        unique_key=['pickup_location_id', 'pickup_date'],
+         on_schema_change='append_new_columns'
+     )
+ }}

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Domain model and rules: no I/O beyond writing export files, no Snowflake dependency. -->
+  <PropertyGroup>
+    <RootNamespace>FleetTelemetry</RootNamespace>
+  </PropertyGroup>
+
+</Project>

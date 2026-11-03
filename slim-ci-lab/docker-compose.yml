@@ -1,0 +1,18 @@
+# Snowflake-Next emulator for Slim CI Lab. dbt and the loader run on the host
+# (or the CI runner) and connect through the published port.
+services:
+  snowflake:
+    image: ${SNOWFLAKE_IMAGE:-localstack/snowflake-next:latest}
+    pull_policy: always
+    ports:
+      - "127.0.0.1:${SNOWFLAKE_PORT:-4566}:4566"
+    environment:
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:?set LOCALSTACK_AUTH_TOKEN}
+    volumes:
+      - ./init:/etc/localstack/init/ready.d:ro
+    networks:
+      default:
+        aliases:
+          - snowflake.localhost.localstack.cloud
+          - stages.s3.localhost.localstack.cloud
+          - stages-enc.s3.localhost.localstack.cloud

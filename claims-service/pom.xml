@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Spring Boot's parent pins every managed dependency and plugin version
+         (HikariCP, Liquibase, Testcontainers, JUnit, Surefire). -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.16</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>claims-service-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>Claims Service (parent)</name>
+    <description>Spring Boot insurance-claims service on Snowflake, tested against the Snowflake-Next emulator</description>
+
+    <modules>
+        <module>claims-api</module>
+    </modules>
+
+    <properties>
+        <java.version>21</java.version>
+        <snowflake-jdbc.version>4.4.0</snowflake-jdbc.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+</project>

@@ -1,0 +1,48 @@
+# Connection profiles. dev, prod and pr point at the Snowflake-Next emulator;
+# cloud points at a real account. All four use key-pair (SNOWFLAKE_JWT) auth,
+# so there is no password anywhere. Pick one with --target or DBT_TARGET.
+slim_ci_lab:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev: &emulator
+      type: snowflake
+      account: snowflake
+      host: snowflake.localhost.localstack.cloud
+      port: "{{ env_var('SNOWFLAKE_PORT', '4566') | as_number }}"
+      protocol: https
+      user: SAMPLE_SVC
+      authenticator: snowflake_jwt
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '.secrets/rsa_key.p8') }}"
+      role: TRANSFORMER
+      warehouse: TRANSFORMING
+      database: "{{ env_var('DBT_DATABASE', 'SLIM_CI') }}"
+      # Personal sandbox: dev_<user>_staging, dev_<user>_marts, ...
+      schema: "dev_{{ env_var('USER', 'local') | lower }}"
+      threads: 4
+      query_tag: slim-ci-lab
+      reuse_connections: true
+
+    # Production state: custom schemas used verbatim (staging, marts, ...).
+    prod:
+      <<: *emulator
+      schema: analytics
+
+    # One schema per pull request (see macros/generate_schema_name.sql).
+    pr:
+      <<: *emulator
+      schema: "pr_{{ env_var('DBT_PR_NUMBER') }}"
+
+    # Real Snowflake. Behaves like prod, or like pr when DBT_PR_NUMBER is set.
+    cloud:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      authenticator: snowflake_jwt
+      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORMING') }}"
+      database: "{{ env_var('DBT_DATABASE', 'SLIM_CI') }}"
+      schema: analytics
+      threads: 4
+      query_tag: slim-ci-lab
+      reuse_connections: true

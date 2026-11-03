@@ -1,0 +1,74 @@
+-- Tables of the metering API, created as the service role so it owns them.
+--
+-- Everything after the USE DATABASE line is database-relative: the integration
+-- tests apply this file to their own database (they skip the USE ROLE and
+-- USE DATABASE lines and run the rest in a session on that database).
+
+USE ROLE METERING_APP;
+USE DATABASE METERING;
+
+CREATE SCHEMA IF NOT EXISTS BILLING;
+USE SCHEMA BILLING;
+
+-- Graduated price tiers, one row per tier. A tier's FLAT_FEE_CENTS is charged once
+-- the usage reaches it; tier 1 is always reached, so its flat fee is the monthly fee.
+-- UP_TO_CALLS is the last call of the tier (NULL for the open-ended top tier).
+CREATE TABLE IF NOT EXISTS PRICE_PLANS (
+  PLAN_ID VARCHAR(16) NOT NULL,
+  TIER_NO NUMBER(2, 0) NOT NULL,
+  UP_TO_CALLS NUMBER(18, 0),
+  UNIT_PRICE_MICROS NUMBER(18, 0) NOT NULL,
+  FLAT_FEE_CENTS NUMBER(18, 0) NOT NULL,
+  PRIMARY KEY (PLAN_ID, TIER_NO)
+);
+
+CREATE TABLE IF NOT EXISTS CUSTOMERS (
+  CUSTOMER_ID VARCHAR(32) NOT NULL PRIMARY KEY,
+  NAME VARCHAR(200) NOT NULL,
+  PLAN_ID VARCHAR(16) NOT NULL,
+  CREATED_AT TIMESTAMP_NTZ NOT NULL
+);
+
+-- One row per usage report from the API gateway: QUANTITY calls by one customer in
+-- one reporting window. EVENT_ID is the idempotency key; INVOICE_ID is set when the
+-- event is billed.
+CREATE TABLE IF NOT EXISTS USAGE_EVENTS (
+  EVENT_ID VARCHAR(64) NOT NULL PRIMARY KEY,
+  CUSTOMER_ID VARCHAR(32) NOT NULL,
+  QUANTITY NUMBER(18, 0) NOT NULL,
+  OCCURRED_AT TIMESTAMP_NTZ NOT NULL,
+  RECEIVED_AT TIMESTAMP_NTZ NOT NULL,
+  INVOICE_ID VARCHAR(64)
+);
+
+-- Landing table for ingest batches: each POST /v1/events writes its rows here under
+-- a fresh BATCH_ID with one array-bound INSERT, MERGEs them into USAGE_EVENTS and
+-- deletes them again, all in one transaction.
+CREATE TRANSIENT TABLE IF NOT EXISTS USAGE_EVENTS_STAGING (
+  BATCH_ID VARCHAR(36) NOT NULL,
+  EVENT_ID VARCHAR(64) NOT NULL,
+  CUSTOMER_ID VARCHAR(32) NOT NULL,
+  QUANTITY NUMBER(18, 0) NOT NULL,
+  OCCURRED_AT TIMESTAMP_NTZ NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS INVOICES (
+  INVOICE_ID VARCHAR(64) NOT NULL PRIMARY KEY,
+  CUSTOMER_ID VARCHAR(32) NOT NULL,
+  BILLING_MONTH DATE NOT NULL,
+  PLAN_ID VARCHAR(16) NOT NULL,
+  TOTAL_CALLS NUMBER(18, 0) NOT NULL,
+  TOTAL_CENTS NUMBER(18, 0) NOT NULL,
+  CLOSED_AT TIMESTAMP_NTZ NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS INVOICE_LINES (
+  INVOICE_ID VARCHAR(64) NOT NULL,
+  LINE_NO NUMBER(4, 0) NOT NULL,
+  TIER_NO NUMBER(2, 0) NOT NULL,
+  QUANTITY NUMBER(18, 0) NOT NULL,
+  UNIT_PRICE_MICROS NUMBER(18, 0) NOT NULL,
+  FLAT_FEE_CENTS NUMBER(18, 0) NOT NULL,
+  AMOUNT_CENTS NUMBER(18, 0) NOT NULL,
+  PRIMARY KEY (INVOICE_ID, LINE_NO)
+);

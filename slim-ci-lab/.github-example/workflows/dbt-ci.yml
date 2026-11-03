@@ -1,0 +1,137 @@
+# Slim CI for this dbt project, against the Snowflake-Next emulator.
+#
+# Copy to .github/workflows/dbt-ci.yml in a repository whose root is this
+# sample (dbt/, scripts/, Makefile, ...). The pull request job needs one
+# secret, LOCALSTACK_AUTH_TOKEN, and no Snowflake credentials: the emulator
+# runs as a container on the runner, so a PR build costs 0 credits.
+#
+# The manually triggered `parity` job runs the same script against a real
+# Snowflake account (billable). It needs the
+# SNOWFLAKE_ACCOUNT and SNOWFLAKE_USER variables and the SNOWFLAKE_PRIVATE_KEY
+# secret (PKCS#8 PEM for a key-pair user).
+name: dbt-ci
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: Branch whose models form production state
+        default: main
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dbt-ci-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  UV_FROZEN: "1"
+
+jobs:
+  slim-ci:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+      DBT_PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@v4
+
+      - name: Check out the base branch (production state)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: .base
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Cache the pinned TLC download
+        uses: actions/cache@v4
+        with:
+          path: .cache/tlc
+          key: tlc-yellow-2024-01-${{ hashFiles('src/slim_ci_lab/tlc.py') }}
+
+      - name: Start the emulator
+        run: make up
+
+      - name: Slim CI (prod state from base, PR build with state:modified+ --defer)
+        env:
+          PROD_PROJECT_DIR: .base/dbt
+          PR_PROJECT_DIR: dbt
+        run: scripts/ci_local.sh
+
+      - name: Keep dbt artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts-pr-${{ github.event.pull_request.number }}
+          path: |
+            prod-artifacts/manifest.json
+            dbt/target/run_results.json
+            dbt/target/manifest.json
+          if-no-files-found: ignore
+
+      - name: Emulator logs on failure
+        if: failure()
+        run: docker compose -p snfs-slim-ci-lab logs --tail 300
+
+      - name: Stop the emulator
+        if: always()
+        run: make down
+
+  parity:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: snowflake-parity
+    env:
+      TEST_TARGET: SNOWFLAKE_CLOUD
+      SNOWFLAKE_ACCOUNT: ${{ vars.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
+      SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE || 'TRANSFORMER' }}
+      SNOWFLAKE_WAREHOUSE: ${{ vars.SNOWFLAKE_WAREHOUSE || 'TRANSFORMING' }}
+      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ github.workspace }}/.secrets/rsa_key.p8
+      DBT_DATABASE: SLIM_CI_PARITY
+      DBT_PR_NUMBER: parity_${{ github.run_id }}
+      PROD_TARGET: cloud
+      PR_TARGET: cloud
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the base branch (production state)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base_ref }}
+          path: .base
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Write the key-pair private key
+        env:
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+        run: |
+          install -d -m 700 .secrets
+          printf '%s\n' "$SNOWFLAKE_PRIVATE_KEY" > .secrets/rsa_key.p8
+          chmod 600 .secrets/rsa_key.p8
+
+      - name: Install
+        run: uv sync
+
+      - name: Slim CI on real Snowflake (billable)
+        env:
+          PROD_PROJECT_DIR: .base/dbt
+          PR_PROJECT_DIR: dbt
+        run: scripts/ci_local.sh
+
+      - name: Drop the parity PR schema
+        if: always()
+        run: uv run dbt run-operation drop_pr_schema --target cloud --project-dir dbt --profiles-dir dbt

@@ -1,0 +1,26 @@
+[project]
+name = "order-to-cash-cdc"
+version = "0.1.0"
+description = "Kafka change events into current-state and SCD2 tables through a stream-driven Snowflake task"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = "==3.12.*"
+dependencies = [
+    "snowflake-connector-python>=5.1,<6",
+    "confluent-kafka>=2.6,<3",
+    "requests>=2.32,<3",
+    "cryptography>=43",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<9",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"

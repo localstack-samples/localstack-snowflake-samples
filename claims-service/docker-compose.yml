@@ -1,0 +1,20 @@
+# A long-lived emulator for `make seed` and `make run` (and for SnowSQL, DBeaver or
+# any JDBC tool). The test suite does not use it: `./mvnw verify` starts its own
+# emulator with Testcontainers.
+services:
+  snowflake:
+    image: ${SNOWFLAKE_IMAGE:-localstack/snowflake-next:latest}
+    pull_policy: always
+    ports:
+      - "127.0.0.1:${SNOWFLAKE_PORT:-4566}:4566"
+    environment:
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:?set LOCALSTACK_AUTH_TOKEN}
+    volumes:
+      # 01_platform: warehouse, roles, database, schema, users and grants.
+      - ./init:/etc/localstack/init/ready.d:ro
+    networks:
+      default:
+        aliases:
+          - snowflake.localhost.localstack.cloud
+          - stages.s3.localhost.localstack.cloud
+          - stages-enc.s3.localhost.localstack.cloud

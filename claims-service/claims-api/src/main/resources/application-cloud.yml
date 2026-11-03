@@ -1,0 +1,11 @@
+# Real Snowflake account: SPRING_PROFILES_ACTIVE=cloud. Consumes credits.
+claims:
+  snowflake:
+    url: jdbc:snowflake://${SNOWFLAKE_HOST:${SNOWFLAKE_ACCOUNT}.snowflakecomputing.com}:443/
+    account: ${SNOWFLAKE_ACCOUNT}
+    user: ${SNOWFLAKE_USER}
+    private-key-path: ${SNOWFLAKE_PRIVATE_KEY_PATH}
+    role: ${SNOWFLAKE_ROLE}
+    warehouse: ${SNOWFLAKE_WAREHOUSE}
+    database: ${SNOWFLAKE_DATABASE:CLAIMS}
+    schema: ${SNOWFLAKE_SCHEMA:CORE}
