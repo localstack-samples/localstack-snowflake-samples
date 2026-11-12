@@ -73,7 +73,7 @@ git init
 git remote add origin -f git@github.com:localstack-samples/localstack-snowflake-samples.git
 git config core.sparseCheckout true
 echo <LOCALSTACK_SAMPLE_DIRECTORY_NAME> >> .git/info/sparse-checkout
-git pull origin master
+git pull origin main
 ```
 
 The commands above use sparse checkout to pull only the sample you need.
