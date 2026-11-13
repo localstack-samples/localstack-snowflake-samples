@@ -49,7 +49,7 @@ As an alternative to `poetry`, the project can also be set up via `pip`:
 
 1. Create a python 3.8 virtual environment
 2. Switch into the created virtual environment
-3. Use provided `requirements.txt` to install the dependencies: `pip -r requirements.txt`
+3. Use provided `requirements.txt` to install the dependencies: `pip install -r requirements.txt`
 
 ## Streamlit connection details
 
@@ -91,9 +91,9 @@ The app connects on port 443, the connector default, so publish that port.
 
 The project comes with a [SQL sheet](./.assets/setup.sql) to be run in the environment.
 
-For example, if you have the [`snow` CLI](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/) configured with a `localstack` connection profile, the SQL script can be executed as follows:
+For example, if you have the [`snow` CLI](https://snowflake.localstack.cloud/user-guide/integrations/snow-cli/) configured with a `local` connection profile, the SQL script can be executed with `make init`, which runs:
 ```
-snow sql -c localstack -f .assets/setup.sql
+snow sql -c local -f .assets/setup.sql
 ```
 
 ## Running the app
